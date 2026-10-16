@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transfer Window</title>
+<meta name="description" content="A multiplayer auction draft game. Made by Harry Sujivan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@500;700&display=swap">
+<style>
+/* Layout: laptop game table. Each game mode repaints the ground through theme tokens; the player on the block is a trading card whose finish shows its rarity. */
+:root{
+  --bg:#0e3a28;--bg2:#114330;--panel:#0a2c1e;--panel2:#0d3324;--accent:#f2c14e;--accent2:#ff6b4a;
+  --chalk:#f3f5f0;--dim:rgba(243,245,240,.66);--line:rgba(255,255,255,.14);--ink:#141414;
+  --pattern:repeating-linear-gradient(90deg,var(--bg) 0 72px,var(--bg2) 72px 144px);
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:"Barlow",ui-sans-serif,system-ui,sans-serif;
+  --label:"Barlow Condensed","Arial Narrow",sans-serif;
+  color-scheme:dark;
+}
+body[data-theme=anime]{--bg:#1a1036;--bg2:#251750;--panel:#120b28;--panel2:#1b1140;--accent:#ff5fae;--accent2:#4fd6ff;--pattern:repeating-linear-gradient(115deg,var(--bg) 0 46px,var(--bg2) 46px 50px)}
+body[data-theme=mcu]{--bg:#2a0a0e;--bg2:#3b1016;--panel:#1d0609;--panel2:#2b0a0f;--accent:#ffd447;--accent2:#ff4141;--pattern:radial-gradient(circle at 20% 10%,#4a121a 0,transparent 45%),radial-gradient(circle at 85% 80%,#3d0e15 0,transparent 40%),var(--bg)}
+body[data-theme=dceu]{--bg:#0c1424;--bg2:#13203a;--panel:#080e1a;--panel2:#0f1a2e;--accent:#4da3ff;--accent2:#ffcf3f;--pattern:linear-gradient(160deg,#132242 0,var(--bg) 55%)}
+body[data-theme=basketball]{--bg:#3a1f10;--bg2:#432512;--panel:#24130a;--panel2:#30190d;--accent:#ff8a2a;--accent2:#ffe0b0;--pattern:repeating-linear-gradient(0deg,var(--bg) 0 38px,var(--bg2) 38px 40px)}
+body[data-theme=cricket]{--bg:#1d3b1a;--bg2:#24481f;--panel:#132812;--panel2:#1a3418;--accent:#f4ecd0;--accent2:#e2513e;--pattern:radial-gradient(ellipse at 50% 40%,var(--bg2) 0,var(--bg) 70%)}
+body[data-theme=baseball]{--bg:#0f1f3d;--bg2:#15284c;--panel:#0a1530;--panel2:#11203f;--accent:#ff5a4e;--accent2:#f5f1e6;--pattern:repeating-linear-gradient(45deg,var(--bg) 0 60px,var(--bg2) 60px 120px)}
+body[data-theme=videogame]{--bg:#120a24;--bg2:#21133f;--panel:#0c0618;--panel2:#170c2e;--accent:#ffde3b;--accent2:#b46bff;--pattern:linear-gradient(var(--bg2) 1px,transparent 1px) 0 0/32px 32px,linear-gradient(90deg,var(--bg2) 1px,transparent 1px) 0 0/32px 32px,var(--bg)}
+body[data-theme=starwars]{--bg:#05060c;--bg2:#10142a;--panel:#0b0d18;--panel2:#121528;--accent:#ffe81f;--accent2:#4fc3ff;--pattern:radial-gradient(1px 1px at 20px 30px,#fff,transparent) 0 0/240px 220px,radial-gradient(1px 1px at 120px 80px,#cfd8ff,transparent) 0 0/240px 220px,radial-gradient(1.5px 1.5px at 200px 160px,#fff,transparent) 0 0/240px 220px,radial-gradient(1px 1px at 60px 190px,#fff,transparent) 0 0/240px 220px,var(--bg)}
+body[data-theme=pokemon]{--bg:#8f1022;--bg2:#a3142a;--panel:#5c0a16;--panel2:#6e0d1b;--accent:#ffcb05;--accent2:#7fb2ff;--pattern:radial-gradient(circle at 50% 50%,transparent 0 46px,var(--bg2) 46px 50px,transparent 50px) 0 0/140px 140px,var(--bg)}
+body[data-theme=mega]{--bg:#140f22;--bg2:#1d1631;--panel:#0e0a18;--panel2:#181227;--accent:#ff9f1c;--accent2:#2ec4b6;--pattern:conic-gradient(from 200deg at 80% 0%,#2a1640,var(--bg) 25%,#0f2230 50%,var(--bg) 75%,#2a1640)}
+body[data-theme=custom]{--bg:#1c1f24;--bg2:#22262c;--panel:#13161a;--panel2:#1a1e23;--accent:#7cd4c4;--accent2:#ff8fa3;--pattern:repeating-linear-gradient(0deg,var(--bg) 0 24px,var(--bg2) 24px 25px)}
+*{box-sizing:border-box}
+html,body{min-height:100%;margin:0}
+body{background:var(--pattern);background-color:var(--bg);background-attachment:fixed;color:var(--chalk);font-family:var(--body);font-size:15px;line-height:1.45;padding-inline:20px;padding-block:18px 40px;transition:background-color .4s}
+.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);font-weight:900;margin:0;text-wrap:balance;letter-spacing:.01em;text-transform:uppercase}
+h2{font-size:1.7rem;line-height:1}
+h3{font-size:1.2rem;line-height:1}
+p{margin:0}
+.lbl{font-family:var(--label);font-weight:700;text-transform:uppercase;letter-spacing:.09em;font-size:.78rem;color:var(--dim)}
+.muted{color:var(--dim)}.small{font-size:.86rem}
+.acc{color:var(--accent)}
+.panel{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.between{justify-content:space-between}
+input,select,textarea{font:inherit;color:var(--chalk);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-width:0}
+textarea{width:100%;min-height:150px;resize:vertical}
+select option,select optgroup{background:var(--panel);color:var(--chalk)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button{font-family:var(--label);font-weight:700;font-size:1rem;letter-spacing:.04em;text-transform:uppercase;border:0;border-radius:9px;padding:10px 16px;cursor:pointer;background:var(--chalk);color:var(--ink);transition:transform .08s,filter .15s}
+button:not(:disabled):hover{filter:brightness(1.08)}
+button:not(:disabled):active{transform:translateY(1px)}
+button.acc-b{background:var(--accent);color:var(--ink)}
+button.ghost{background:transparent;color:var(--chalk);border:1px solid var(--line)}
+button.big{font-size:1.25rem;padding:14px 26px}
+button.sm{font-size:.82rem;padding:6px 10px}
+button:disabled{opacity:.32;cursor:not-allowed}
+.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
+.brand{font-family:var(--display);font-weight:900;font-size:1.8rem;text-transform:uppercase;line-height:1}
+.brand span{color:var(--accent)}
+.steps{display:flex;gap:4px;flex-wrap:wrap}
+.steps span{font-family:var(--label);font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;padding:4px 9px;border-radius:5px;background:var(--panel);color:var(--dim)}
+.steps span.on{background:var(--accent);color:var(--ink)}
+.steps span.done{color:var(--chalk)}
+.credit{font-family:var(--label);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.8rem;color:var(--dim);text-align:center}
+.credit b{color:var(--accent)}
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:center;min-height:440px}
+@media (max-width:860px){.hero{grid-template-columns:1fr}.deck{display:none}}
+.title{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(3.4rem,9vw,7.5rem);line-height:.82;letter-spacing:-.01em}
+.title .w{display:block}
+.title .w:nth-child(2){color:var(--accent)}
+.title i{font-style:normal;display:inline-block;animation:rise .7s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes rise{from{transform:translateY(60%) rotate(8deg);opacity:0}}
+.tag{font-size:1.2rem;max-width:34ch;color:var(--dim)}
+.netnote{font-size:.9rem;color:var(--dim)}
+.netnote.err{color:var(--accent2)}
+.deck{position:relative;height:420px}
+.deck .card{position:absolute;width:170px;animation:floaty 6s ease-in-out infinite}
+@keyframes floaty{0%,100%{translate:0 0}50%{translate:0 -14px}}
+.deck .card.spin{animation:floaty 6s ease-in-out infinite,spin 9s ease-in-out infinite}
+@keyframes spin{0%,80%{rotate:y 0deg}90%{rotate:y 180deg}100%{rotate:y 360deg}}
+.howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.howto .st{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.howto .num{font-family:var(--display);font-weight:900;font-size:2.4rem;line-height:.8;color:var(--accent)}
+.modes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.mode{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:14px;border-radius:12px;color:#fff;border:1px solid rgba(255,255,255,.15);text-transform:none;letter-spacing:0}
+.mode b{font-family:var(--display);font-weight:900;font-size:1.25rem;text-transform:uppercase;line-height:1}
+.mode span{font-family:var(--body);font-weight:400;font-size:.82rem;opacity:.85}
+.mode em{font-style:normal;font-family:var(--label);font-weight:700;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;opacity:.9;margin-top:4px}
+.lb{display:grid;grid-template-columns:2em 1fr auto;gap:6px 10px;align-items:baseline}
+.lb b{font-family:var(--display);font-size:1.2rem}
+.joingrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:860px){.joingrid{grid-template-columns:1fr}}
+.codein{font-family:var(--display);font-weight:900;font-size:2rem;letter-spacing:.2em;text-transform:uppercase;width:100%}
+.codebig{font-family:var(--display);font-weight:900;font-size:3.8rem;letter-spacing:.14em;color:var(--accent);line-height:.9}
+.card{--tier1:#e0a877;--tier2:#a8683c;color:var(--ink);background:linear-gradient(150deg,var(--tier1),var(--tier2));border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;position:relative;box-shadow:0 12px 0 rgba(0,0,0,.28),inset 0 0 0 2px rgba(255,255,255,.35);min-height:220px;overflow:hidden}
+.card.silver{--tier1:#f4f6f9;--tier2:#a9b4bf}
+.card.gold{--tier1:#fff0a8;--tier2:#d9a520}
+.card.legend{background:linear-gradient(120deg,#ffd1f7,#c4f1ff,#fff3b0,#d4c4ff,#ffd1f7);background-size:300% 300%;animation:holo 5s linear infinite}
+@keyframes holo{to{background-position:300% 0}}
+.card.mystery{background:repeating-linear-gradient(45deg,#2a2a3a 0 14px,#34344c 14px 28px);color:var(--chalk);box-shadow:0 12px 0 rgba(0,0,0,.28),inset 0 0 0 2px var(--accent)}
+.card.power{background:radial-gradient(circle at 30% 20%,#4b3a7a,#1b1530 70%);color:#fff;box-shadow:0 12px 0 rgba(0,0,0,.28),inset 0 0 0 2px var(--accent)}
+.card .rt{font-family:var(--display);font-weight:900;font-size:4rem;line-height:.82}
+.card .nm{font-family:var(--display);font-weight:900;font-size:1.7rem;line-height:.95;text-transform:uppercase;text-wrap:balance;overflow-wrap:anywhere}
+.card .meta{font-family:var(--label);font-weight:700;letter-spacing:.07em;text-transform:uppercase;font-size:.82rem;display:flex;gap:4px 10px;flex-wrap:wrap}
+.card .tier{position:absolute;top:12px;right:12px;font-family:var(--label);font-weight:700;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.78);color:#fff;padding:3px 8px;border-radius:4px}
+.card .big{font-family:var(--display);font-weight:900;font-size:6rem;line-height:.8;color:var(--accent)}
+.card .pw{font-family:var(--display);font-weight:900;font-size:3.4rem;line-height:.85;color:var(--accent)}
+.deck .card .rt{font-size:3rem}.deck .card .nm{font-size:1.25rem}.deck .card{min-height:180px}
+.flip{animation:flipIn .55s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes flipIn{from{transform:perspective(800px) rotateY(95deg) scale(.85);opacity:.3}}
+.table{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:820px){.table{grid-template-columns:1fr}}
+.cardwrap{display:flex;flex-direction:column;gap:12px}
+.lotinfo{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}
+.amt{font-family:var(--display);font-weight:900;font-size:4rem;line-height:.85;color:var(--accent);font-variant-numeric:tabular-nums}
+.clock{display:flex;flex-direction:column;gap:5px;min-width:150px;text-align:right}
+.clock .sec{font-family:var(--display);font-weight:900;font-size:3rem;line-height:.85;font-variant-numeric:tabular-nums}
+.clock .barb{height:8px;border-radius:999px;background:var(--panel2);overflow:hidden}
+.clock .barb b{display:block;height:100%;background:var(--accent);transition:width .1s linear}
+.clock.hot .sec{color:var(--accent2)}.clock.hot .barb b{background:var(--accent2)}
+.shake{animation:shake .35s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.flash{animation:flash .35s}
+@keyframes flash{50%{box-shadow:inset 0 0 0 3px var(--accent2),0 0 30px color-mix(in srgb,var(--accent2) 50%,transparent)}}
+.bidders{display:flex;flex-direction:column;gap:8px}
+.bidder{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+.bidder.lead{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.bidder.out{opacity:.5}
+.bidder.me{background:color-mix(in srgb,var(--panel2) 80%,var(--accent) 20%)}
+.bidder .nm b{font-size:1.05rem}
+.bidder .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.badge{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.45rem;background:var(--c,#888);box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);flex:none}
+.badge.s{width:28px;height:28px;font-size:.95rem;border-radius:8px}
+.coin{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
+.status{font-family:var(--label);font-weight:700;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
+.youtag{font-family:var(--label);font-weight:700;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;background:var(--accent);color:var(--ink);border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+.sealin{width:110px}
+.rec{display:flex;gap:10px;align-items:center;font-size:.92rem}
+.squads{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.sheet{background:var(--panel2);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.sheet header{display:flex;align-items:center;gap:10px}
+.sheet header .nm{font-family:var(--display);font-weight:900;font-size:1.3rem;text-transform:uppercase;line-height:1;flex:1;min-width:0;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.pc{display:inline-flex;align-items:center;gap:5px;padding:3px 8px 3px 4px;border-radius:7px;font-size:.84rem;font-weight:600;color:var(--ink);background:linear-gradient(150deg,var(--tier1,#e0a877),var(--tier2,#a8683c))}
+.pc.silver{--tier1:#f4f6f9;--tier2:#a9b4bf}.pc.gold{--tier1:#fff0a8;--tier2:#d9a520}.pc.legend{background:linear-gradient(120deg,#ffd1f7,#c4f1ff,#fff3b0)}
+.pc .r{font-family:var(--display);font-weight:900;font-size:.95rem;background:rgba(0,0,0,.78);color:#fff;border-radius:4px;padding:0 4px}
+.pc .x2{background:var(--accent2);color:var(--ink);border-radius:4px;padding:0 4px;font-family:var(--label)}
+.pitch{background:repeating-linear-gradient(90deg,#1b5c3c 0 24px,#1f6643 24px 48px);border:2px solid rgba(255,255,255,.4);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;position:relative}
+.pitch::after{content:"";position:absolute;left:8%;right:8%;top:50%;border-top:2px solid rgba(255,255,255,.3)}
+.pitch .ln{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;min-height:24px;position:relative;z-index:1}
+.pw-tag{font-family:var(--label);font-weight:700;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:2px 8px}
+.empty{color:var(--dim);font-style:italic;font-size:.88rem}
+.log{display:flex;flex-direction:column;gap:3px;max-height:190px;overflow:auto;font-size:.88rem;color:var(--dim)}
+.log div:first-child{color:var(--chalk)}
+.setup{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.setup{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.field{display:flex;flex-direction:column;gap:6px}
+.sets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kv{display:flex;flex-direction:column;gap:2px;background:var(--panel2);border-radius:10px;padding:10px 12px}
+.kv b{font-family:var(--display);font-size:1.35rem}
+.swatches{display:flex;gap:6px;flex-wrap:wrap}
+.sw{width:30px;height:30px;border-radius:8px;border:2px solid transparent;padding:0;background:var(--c)}
+.sw.on{border-color:var(--chalk);box-shadow:0 0 0 2px var(--bg)}
+.icons{display:flex;gap:4px;flex-wrap:wrap}
+.ic{width:36px;height:36px;padding:0;font-size:1.15rem;background:var(--panel2);border:1px solid var(--line)}
+.ic.on{background:var(--accent)}
+.mgr{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:8px;border-radius:10px;background:var(--panel2)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;z-index:20;overflow:auto}
+.modal .panel{width:min(1100px,100%);background:var(--panel)}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.ritem{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:7px 9px;border-radius:9px;background:var(--panel2);border-left:5px solid var(--tc,#a8683c)}
+.ritem .n{font-weight:600;line-height:1.15}
+.ritem .t{font-size:.76rem;color:var(--dim)}
+.ritem .rr{font-family:var(--display);font-weight:900;font-size:1.4rem}
+.ritem.gone{opacity:.45}
+.trade{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.trade{grid-template-columns:1fr}}
+.pick{display:flex;flex-direction:column;gap:4px}
+.pick label{display:flex;gap:8px;align-items:center;padding:4px 6px;border-radius:7px;cursor:pointer;font-size:.92rem}
+.pick label:hover{background:var(--panel2)}
+.offer{padding:12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.offer.forme{border-color:var(--accent)}
+.offer .sides{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ov{position:fixed;inset:0;display:grid;place-items:center;z-index:30;background:rgba(0,0,0,.55);animation:fade .2s}
+.ov.solid{background:color-mix(in srgb,var(--bg) 95%,transparent)}
+@keyframes fade{from{opacity:0}}
+.soldbox{display:flex;flex-direction:column;align-items:center;gap:16px;position:relative}
+.soldbox .card{width:260px}
+.stamp{position:absolute;top:70px;font-family:var(--display);font-weight:900;font-size:5.5rem;color:var(--accent2);border:8px solid var(--accent2);border-radius:14px;padding:0 18px;transform:rotate(-14deg);background:rgba(0,0,0,.25);animation:stamp .4s cubic-bezier(.3,1.6,.5,1) both;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+@keyframes stamp{from{transform:rotate(-14deg) scale(3);opacity:0}}
+.soldto{font-family:var(--display);font-weight:900;font-size:2rem;text-transform:uppercase;text-align:center}
+.drum{font-family:var(--display);font-weight:900;font-size:clamp(2.5rem,6vw,4.5rem);text-transform:uppercase;text-align:center;animation:pulse .5s ease-in-out infinite alternate}
+@keyframes pulse{to{transform:scale(1.06)}}
+canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+.podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:end;max-width:760px;margin:0 auto;width:100%}
+.step{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.step .blk{width:100%;border-radius:12px 12px 0 0;background:var(--c);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:3rem;color:var(--ink);animation:grow .8s cubic-bezier(.2,1.2,.4,1) both;box-shadow:inset 0 -6px 0 rgba(0,0,0,.2)}
+@keyframes grow{from{transform:scaleY(0);transform-origin:bottom}}
+.step .who{font-family:var(--display);font-weight:900;font-size:1.4rem;text-transform:uppercase;line-height:1}
+.crown{font-family:var(--label);font-weight:700;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;font-size:.8rem}
+.comm{font-size:1.08rem;line-height:1.6;max-width:70ch;white-space:pre-wrap}
+.comm .cur{display:inline-block;width:.55em;height:1.1em;background:var(--accent);vertical-align:-2px;animation:blink .8s steps(2) infinite}
+@keyframes blink{to{opacity:0}}
+.resgrid{display:grid;grid-template-columns:minmax(0,1.5fr) 300px;gap:18px;align-items:start}
+@media (max-width:900px){.resgrid{grid-template-columns:1fr}}
+.mvp .card{width:100%}
+.rank{display:grid;grid-template-columns:2em 32px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.rank .sc{font-family:var(--display);font-weight:900;font-size:1.6rem;color:var(--accent)}
+.judge{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;text-align:left}
+@media (max-width:900px){.judge{grid-template-columns:1fr}}
+.judge .st{background:var(--panel2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.judge textarea{min-height:110px;font-size:.85rem}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--chalk);color:var(--ink);padding:10px 16px;border-radius:9px;font-weight:600;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.35);z-index:50}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="layer"></div>
+<canvas id="fx"></canvas>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+// ================= data =================
+const R=s=>s.trim().split("\n").map(l=>{const[n,ro,t,r]=l.split("|");return{name:n.trim(),pos:ro.trim(),nat:t.trim(),r:+r}});
+const FIGHT="Judge a team battle: every lineup fights every other lineup as a team, tournament style. Use what each character can actually do (powers, feats, intelligence) and how well the team works together. Ratings are only a rough guide.";
+const MODES={
+soccer:{name:"Football",noun:"player",roles:["GK","DEF","MID","FWD"],judge:"Judge which team would win football matches. Player quality matters most, but a balanced lineup (goalkeeper, defence, midfield, attack) beats a team of only forwards.",list:R(`
+Kylian Mbappé|FWD|FRA|91
+Erling Haaland|FWD|NOR|91
+Harry Kane|FWD|ENG|90
+Ousmane Dembélé|FWD|FRA|90
+Mohamed Salah|FWD|EGY|89
+Vinícius Júnior|FWD|BRA|89
+Lamine Yamal|FWD|ESP|89
+Lautaro Martínez|FWD|ARG|88
+Raphinha|FWD|BRA|88
+Bukayo Saka|FWD|ENG|88
+Lionel Messi|FWD|ARG|87
+Robert Lewandowski|FWD|POL|87
+Julián Álvarez|FWD|ARG|87
+Alexander Isak|FWD|SWE|87
+Khvicha Kvaratskhelia|FWD|GEO|87
+Michael Olise|FWD|FRA|87
+Cole Palmer|FWD|ENG|87
+Victor Osimhen|FWD|NGA|86
+Viktor Gyökeres|FWD|SWE|86
+Luis Díaz|FWD|COL|86
+Son Heung-min|FWD|KOR|85
+Rafael Leão|FWD|POR|85
+Antoine Griezmann|FWD|FRA|85
+Nico Williams|FWD|ESP|85
+Rodrygo|FWD|BRA|85
+Désiré Doué|FWD|FRA|85
+Cristiano Ronaldo|FWD|POR|84
+Marcus Thuram|FWD|FRA|84
+Hugo Ekitike|FWD|FRA|84
+Ollie Watkins|FWD|ENG|83
+Jonathan David|FWD|CAN|83
+Mohammed Kudus|FWD|GHA|83
+Benjamin Šeško|FWD|SVN|82
+Darwin Núñez|FWD|URU|81
+Jude Bellingham|MID|ENG|89
+Rodri|MID|ESP|89
+Pedri|MID|ESP|89
+Vitinha|MID|POR|89
+Federico Valverde|MID|URU|88
+Jamal Musiala|MID|GER|88
+Declan Rice|MID|ENG|87
+Florian Wirtz|MID|GER|87
+Joshua Kimmich|MID|GER|87
+Kevin De Bruyne|MID|BEL|86
+Bruno Fernandes|MID|POR|86
+Martin Ødegaard|MID|NOR|86
+Phil Foden|MID|ENG|86
+Frenkie de Jong|MID|NED|86
+Nicolò Barella|MID|ITA|86
+Alexis Mac Allister|MID|ARG|86
+Moisés Caicedo|MID|ECU|86
+João Neves|MID|POR|86
+Enzo Fernández|MID|ARG|85
+Dominik Szoboszlai|MID|HUN|85
+Bernardo Silva|MID|POR|85
+Ryan Gravenberch|MID|NED|85
+Hakan Çalhanoğlu|MID|TUR|85
+Fabián Ruiz|MID|ESP|85
+Bruno Guimarães|MID|BRA|85
+Martín Zubimendi|MID|ESP|85
+Luka Modrić|MID|CRO|84
+Aurélien Tchouaméni|MID|FRA|84
+Arda Güler|MID|TUR|84
+Kenan Yıldız|MID|TUR|84
+Eduardo Camavinga|MID|FRA|83
+Gavi|MID|ESP|83
+James Maddison|MID|ENG|82
+Kobbie Mainoo|MID|ENG|81
+Virgil van Dijk|DEF|NED|89
+William Saliba|DEF|FRA|88
+Achraf Hakimi|DEF|MAR|88
+Rúben Dias|DEF|POR|87
+Alessandro Bastoni|DEF|ITA|87
+Gabriel Magalhães|DEF|BRA|87
+Nuno Mendes|DEF|POR|87
+Antonio Rüdiger|DEF|GER|86
+Marquinhos|DEF|BRA|86
+Joško Gvardiol|DEF|CRO|86
+Jules Koundé|DEF|FRA|86
+Trent Alexander-Arnold|DEF|ENG|85
+Ibrahima Konaté|DEF|FRA|85
+Federico Dimarco|DEF|ITA|85
+Alejandro Grimaldo|DEF|ESP|85
+Willian Pacho|DEF|ECU|85
+Theo Hernández|DEF|FRA|84
+Alphonso Davies|DEF|CAN|84
+Kim Min-jae|DEF|KOR|84
+Pau Cubarsí|DEF|ESP|84
+Micky van de Ven|DEF|NED|84
+Éder Militão|DEF|BRA|84
+Reece James|DEF|ENG|84
+Jurriën Timber|DEF|NED|84
+Dean Huijsen|DEF|ESP|83
+Jeremie Frimpong|DEF|NED|83
+Lisandro Martínez|DEF|ARG|83
+Andy Robertson|DEF|SCO|82
+Kyle Walker|DEF|ENG|81
+Alisson|GK|BRA|89
+Thibaut Courtois|GK|BEL|89
+Gianluigi Donnarumma|GK|ITA|89
+Mike Maignan|GK|FRA|87
+Jan Oblak|GK|SVN|87
+David Raya|GK|ESP|87
+Ederson|GK|BRA|86
+Emiliano Martínez|GK|ARG|86
+Gregor Kobel|GK|SUI|86
+Diogo Costa|GK|POR|86
+Marc-André ter Stegen|GK|GER|85
+Yann Sommer|GK|SUI|85
+Unai Simón|GK|ESP|85
+Joan García|GK|ESP|84
+Bart Verbruggen|GK|NED|82
+André Onana|GK|CMR|81`)},
+anime:{name:"Anime fight",noun:"fighter",roles:["HERO","ANTI","VILL"],judge:FIGHT+" Use each character's feats from their own anime or manga.",list:R(`
+Goku|HERO|Dragon Ball|99
+Vegeta|ANTI|Dragon Ball|97
+Gohan|HERO|Dragon Ball|94
+Frieza|VILL|Dragon Ball|96
+Broly|ANTI|Dragon Ball|96
+Jiren|ANTI|Dragon Ball|97
+Beerus|ANTI|Dragon Ball|98
+Naruto Uzumaki|HERO|Naruto|95
+Sasuke Uchiha|ANTI|Naruto|95
+Madara Uchiha|VILL|Naruto|96
+Itachi Uchiha|ANTI|Naruto|90
+Kakashi Hatake|HERO|Naruto|87
+Minato Namikaze|HERO|Naruto|89
+Pain|VILL|Naruto|90
+Monkey D. Luffy|HERO|One Piece|95
+Roronoa Zoro|HERO|One Piece|91
+Sanji|HERO|One Piece|88
+Shanks|ANTI|One Piece|94
+Kaido|VILL|One Piece|95
+Blackbeard|VILL|One Piece|93
+Whitebeard|ANTI|One Piece|94
+Akainu|VILL|One Piece|92
+Ichigo Kurosaki|HERO|Bleach|95
+Sōsuke Aizen|VILL|Bleach|97
+Yhwach|VILL|Bleach|98
+Kenpachi Zaraki|ANTI|Bleach|91
+Byakuya Kuchiki|HERO|Bleach|88
+Saitama|HERO|One Punch Man|99
+Genos|HERO|One Punch Man|82
+Tatsumaki|HERO|One Punch Man|92
+Garou|ANTI|One Punch Man|94
+Boros|VILL|One Punch Man|93
+Satoru Gojo|HERO|Jujutsu Kaisen|97
+Ryomen Sukuna|VILL|Jujutsu Kaisen|98
+Yuji Itadori|HERO|Jujutsu Kaisen|88
+Megumi Fushiguro|HERO|Jujutsu Kaisen|84
+Toji Fushiguro|ANTI|Jujutsu Kaisen|89
+Tanjiro Kamado|HERO|Demon Slayer|83
+Muzan Kibutsuji|VILL|Demon Slayer|92
+Yoriichi Tsugikuni|HERO|Demon Slayer|95
+Kyojuro Rengoku|HERO|Demon Slayer|85
+Eren Yeager|ANTI|Attack on Titan|88
+Levi Ackerman|HERO|Attack on Titan|86
+Mikasa Ackerman|HERO|Attack on Titan|83
+All Might|HERO|My Hero Academia|93
+Izuku Midoriya|HERO|My Hero Academia|91
+Katsuki Bakugo|HERO|My Hero Academia|87
+All For One|VILL|My Hero Academia|93
+Tomura Shigaraki|VILL|My Hero Academia|92
+Meruem|VILL|Hunter x Hunter|96
+Gon Freecss|HERO|Hunter x Hunter|86
+Killua Zoldyck|HERO|Hunter x Hunter|87
+Isaac Netero|HERO|Hunter x Hunter|92
+Hisoka|VILL|Hunter x Hunter|89
+Edward Elric|HERO|Fullmetal Alchemist|82
+Father|VILL|Fullmetal Alchemist|95
+Asta|HERO|Black Clover|88
+Yami Sukehiro|HERO|Black Clover|89
+Denji|HERO|Chainsaw Man|84
+Makima|VILL|Chainsaw Man|92
+Ainz Ooal Gown|ANTI|Overlord|95
+Rimuru Tempest|HERO|That Time I Got Reincarnated as a Slime|97
+Mob|HERO|Mob Psycho 100|94
+Jotaro Kujo|HERO|JoJo's Bizarre Adventure|90
+Dio Brando|VILL|JoJo's Bizarre Adventure|92
+Giorno Giovanna|HERO|JoJo's Bizarre Adventure|93
+Alucard|ANTI|Hellsing|96
+Guts|ANTI|Berserk|87
+Griffith|VILL|Berserk|90`)},
+mcu:{name:"MCU fights",noun:"fighter",roles:["HERO","ANTI","VILL"],judge:FIGHT+" Use only what the characters have shown in the Marvel Cinematic Universe films and shows.",list:R(`
+Thor|HERO|Asgard|95
+Scarlet Witch|ANTI|Avengers|96
+Captain Marvel|HERO|Avengers|95
+Doctor Strange|HERO|Mystic|93
+Hulk|HERO|Avengers|91
+Iron Man|HERO|Avengers|88
+Captain America|HERO|Avengers|84
+Black Widow|HERO|Avengers|74
+Hawkeye|HERO|Avengers|72
+Spider-Man|HERO|Street|86
+Black Panther|HERO|Wakanda|83
+Ant-Man|HERO|Avengers|80
+Wasp|HERO|Avengers|76
+Vision|HERO|Avengers|88
+Falcon|HERO|Avengers|75
+Winter Soldier|ANTI|Avengers|78
+War Machine|HERO|Avengers|79
+Shang-Chi|HERO|Street|85
+Ms. Marvel|HERO|Young Avengers|76
+She-Hulk|HERO|Street|84
+Moon Knight|ANTI|Mystic|83
+Star-Lord|HERO|Guardians|76
+Gamora|HERO|Guardians|77
+Drax|HERO|Guardians|78
+Rocket|HERO|Guardians|75
+Groot|HERO|Guardians|80
+Mantis|HERO|Guardians|70
+Nebula|ANTI|Guardians|76
+Okoye|HERO|Wakanda|74
+Valkyrie|HERO|Asgard|80
+Wong|HERO|Mystic|82
+Ikaris|ANTI|Eternals|90
+Thena|HERO|Eternals|84
+Sersi|HERO|Eternals|83
+Monica Rambeau|HERO|Cosmic|83
+America Chavez|HERO|Mystic|82
+Yelena Belova|ANTI|Thunderbolts|75
+Sentry|ANTI|Thunderbolts|96
+Deadpool|ANTI|X-Men|84
+Wolverine|ANTI|X-Men|87
+Namor|ANTI|Talokan|88
+Loki|ANTI|Asgard|87
+Sylvie|ANTI|Asgard|85
+Venom|ANTI|Street|85
+Thanos|VILL|Cosmic|97
+Hela|VILL|Asgard|93
+Ultron|VILL|Avengers|88
+Dormammu|VILL|Mystic|98
+Ego|VILL|Cosmic|96
+Kang the Conqueror|VILL|Cosmic|92
+Gorr the God Butcher|VILL|Cosmic|89
+Agatha Harkness|VILL|Mystic|88
+Ronan the Accuser|VILL|Cosmic|85
+Abomination|VILL|Street|84
+Killmonger|VILL|Wakanda|80
+Green Goblin|VILL|Street|80
+Doctor Octopus|VILL|Street|81
+Mysterio|VILL|Street|74
+Vulture|VILL|Street|72
+Red Skull|VILL|Hydra|70`)},
+dceu:{name:"DCEU fights",noun:"fighter",roles:["HERO","ANTI","VILL"],judge:FIGHT+" Use what the characters have shown in the DC films (the DCEU and the newer DCU).",list:R(`
+Superman|HERO|Justice League|97
+Wonder Woman|HERO|Justice League|93
+Batman|HERO|Justice League|82
+Aquaman|HERO|Justice League|89
+The Flash|HERO|Justice League|88
+Cyborg|HERO|Justice League|82
+Martian Manhunter|HERO|Justice League|92
+Shazam|HERO|Shazam family|88
+Supergirl|HERO|Kryptonian|92
+Black Adam|ANTI|Kahndaq|94
+Doctor Fate|HERO|Justice Society|92
+Hawkman|HERO|Justice Society|85
+Atom Smasher|HERO|Justice Society|82
+Cyclone|HERO|Justice Society|78
+Blue Beetle|HERO|Solo|84
+Mera|HERO|Atlantis|84
+Mister Terrific|HERO|Justice Gang|80
+Guy Gardner|HERO|Justice Gang|84
+Hawkgirl|HERO|Justice Gang|82
+Metamorpho|HERO|Justice Gang|83
+Krypto|HERO|Kryptonian|70
+Black Canary|HERO|Birds of Prey|74
+Huntress|HERO|Birds of Prey|70
+Katana|HERO|Suicide Squad|71
+Rick Flag|HERO|Suicide Squad|66
+Harley Quinn|ANTI|Suicide Squad|70
+Deadshot|ANTI|Suicide Squad|72
+Bloodsport|ANTI|Suicide Squad|73
+Peacemaker|ANTI|Suicide Squad|74
+King Shark|ANTI|Suicide Squad|76
+El Diablo|ANTI|Suicide Squad|80
+Captain Boomerang|ANTI|Suicide Squad|64
+Ratcatcher 2|ANTI|Suicide Squad|65
+Polka-Dot Man|ANTI|Suicide Squad|66
+Darkseid|VILL|Apokolips|98
+Doomsday|VILL|Kryptonian|95
+General Zod|VILL|Kryptonian|93
+Faora|VILL|Kryptonian|86
+Steppenwolf|VILL|Apokolips|90
+Ares|VILL|Olympus|92
+Cheetah|VILL|Solo|85
+Enchantress|VILL|Suicide Squad|86
+Starro|VILL|Cosmic|88
+Sabbac|VILL|Kahndaq|89
+Black Manta|VILL|Atlantis|79
+Ocean Master|VILL|Atlantis|80
+Ultraman|VILL|Kryptonian|88
+The Engineer|VILL|Solo|80
+Doctor Sivana|VILL|Solo|72
+Lex Luthor|VILL|Solo|72
+Joker|VILL|Gotham|70
+Maxwell Lord|VILL|Solo|68`)},
+basketball:{name:"Basketball",noun:"player",roles:["PG","SG","SF","PF","C"],judge:"Judge which team would win basketball games. Player quality matters most, plus a sensible mix of guards, wings and bigs.",list:R(`
+Nikola Jokić|C|SRB|98
+Shai Gilgeous-Alexander|PG|CAN|97
+Giannis Antetokounmpo|PF|GRE|96
+Luka Dončić|PG|SVN|95
+Victor Wembanyama|C|FRA|94
+Jayson Tatum|SF|USA|93
+Anthony Edwards|SG|USA|93
+Stephen Curry|PG|USA|92
+LeBron James|SF|USA|91
+Kevin Durant|SF|USA|91
+Anthony Davis|PF|USA|91
+Jalen Brunson|PG|USA|91
+Donovan Mitchell|SG|USA|91
+Joel Embiid|C|CMR|91
+Kawhi Leonard|SF|USA|90
+Cade Cunningham|PG|USA|90
+Jaylen Brown|SG|USA|89
+Devin Booker|SG|USA|89
+Evan Mobley|PF|USA|89
+Tyrese Haliburton|PG|USA|88
+Kyrie Irving|PG|AUS|88
+Paolo Banchero|PF|USA|88
+Jalen Williams|SF|USA|88
+Karl-Anthony Towns|C|DOM|88
+Tyrese Maxey|PG|USA|88
+Ja Morant|PG|USA|87
+Trae Young|PG|USA|87
+De'Aaron Fox|PG|USA|87
+Damian Lillard|PG|USA|87
+Domantas Sabonis|C|LTU|87
+Chet Holmgren|C|USA|87
+Jaren Jackson Jr.|PF|USA|87
+Pascal Siakam|PF|CMR|87
+Jamal Murray|PG|CAN|87
+Alperen Şengün|C|TUR|87
+Franz Wagner|SF|GER|87
+Jimmy Butler|SF|USA|86
+Bam Adebayo|C|USA|86
+Zion Williamson|PF|USA|86
+Scottie Barnes|SF|CAN|86
+LaMelo Ball|PG|USA|86
+Jalen Johnson|SF|USA|86
+Lauri Markkanen|PF|FIN|85
+Derrick White|SG|USA|85
+Desmond Bane|SG|USA|85
+Amen Thompson|SG|USA|85
+Ivica Zubac|C|CRO|85
+Rudy Gobert|C|FRA|84
+Josh Giddey|PG|AUS|84
+Dyson Daniels|SG|AUS|84
+Jrue Holiday|PG|USA|84
+Mikal Bridges|SF|USA|84
+Cooper Flagg|SF|USA|84`)},
+cricket:{name:"Cricket",noun:"player",roles:["BAT","WK","ALL","BOWL"],judge:"Judge which team would win cricket matches. Player quality matters most, but a team needs batting and bowling: all-rounders are valuable, and a wicketkeeper helps.",list:R(`
+Virat Kohli|BAT|IND|92
+Rohit Sharma|BAT|IND|89
+Shubman Gill|BAT|IND|89
+Yashasvi Jaiswal|BAT|IND|88
+Suryakumar Yadav|BAT|IND|87
+Jasprit Bumrah|BOWL|IND|96
+Kuldeep Yadav|BOWL|IND|85
+Mohammed Siraj|BOWL|IND|84
+Ravindra Jadeja|ALL|IND|88
+Hardik Pandya|ALL|IND|86
+Rishabh Pant|WK|IND|87
+KL Rahul|WK|IND|85
+Joe Root|BAT|ENG|94
+Harry Brook|BAT|ENG|91
+Ben Stokes|ALL|ENG|89
+Jos Buttler|WK|ENG|87
+Jamie Smith|WK|ENG|84
+Jofra Archer|BOWL|ENG|86
+Mark Wood|BOWL|ENG|84
+Adil Rashid|BOWL|ENG|83
+Steve Smith|BAT|AUS|90
+Travis Head|BAT|AUS|91
+Marnus Labuschagne|BAT|AUS|85
+Usman Khawaja|BAT|AUS|83
+Pat Cummins|BOWL|AUS|92
+Mitchell Starc|BOWL|AUS|90
+Josh Hazlewood|BOWL|AUS|89
+Nathan Lyon|BOWL|AUS|87
+Glenn Maxwell|ALL|AUS|84
+Mitchell Marsh|ALL|AUS|84
+Cameron Green|ALL|AUS|84
+Alex Carey|WK|AUS|83
+Kane Williamson|BAT|NZ|91
+Rachin Ravindra|ALL|NZ|85
+Mitchell Santner|ALL|NZ|83
+Matt Henry|BOWL|NZ|84
+Babar Azam|BAT|PAK|87
+Mohammad Rizwan|WK|PAK|84
+Shaheen Afridi|BOWL|PAK|86
+Kagiso Rabada|BOWL|RSA|92
+Marco Jansen|ALL|RSA|86
+Keshav Maharaj|BOWL|RSA|82
+Aiden Markram|BAT|RSA|85
+Temba Bavuma|BAT|RSA|84
+Heinrich Klaasen|WK|RSA|86
+Rashid Khan|BOWL|AFG|91
+Wanindu Hasaranga|ALL|SL|84
+Kusal Mendis|WK|SL|82
+Shakib Al Hasan|ALL|BAN|83
+Nicholas Pooran|WK|WI|85
+Shai Hope|WK|WI|83
+Andre Russell|ALL|WI|83`)},
+baseball:{name:"Baseball",noun:"player",roles:["P","C","IF","OF","DH"],judge:"Judge which team would win baseball games. Pitching matters a lot, then hitting and defense. A team with no pitcher is at a big disadvantage.",list:R(`
+Shohei Ohtani|DH|JPN|99
+Aaron Judge|OF|USA|96
+Juan Soto|OF|DOM|94
+Bobby Witt Jr.|IF|USA|94
+Cal Raleigh|C|USA|92
+José Ramírez|IF|DOM|91
+Vladimir Guerrero Jr.|IF|CAN|91
+Mookie Betts|IF|USA|90
+Ronald Acuña Jr.|OF|VEN|90
+Gunnar Henderson|IF|USA|90
+Kyle Tucker|OF|USA|90
+Francisco Lindor|IF|PUR|90
+Yordan Alvarez|DH|CUB|90
+Freddie Freeman|IF|CAN|89
+Fernando Tatís Jr.|OF|DOM|89
+Bryce Harper|IF|USA|89
+Ketel Marte|IF|DOM|89
+Corey Seager|IF|USA|88
+Julio Rodríguez|OF|DOM|88
+Elly De La Cruz|IF|DOM|88
+Kyle Schwarber|DH|USA|88
+Corbin Carroll|OF|USA|88
+Manny Machado|IF|DOM|87
+Rafael Devers|IF|DOM|87
+Pete Crow-Armstrong|OF|USA|87
+Pete Alonso|IF|USA|86
+Will Smith|C|USA|86
+James Wood|OF|USA|86
+William Contreras|C|VEN|85
+Adley Rutschman|C|USA|85
+Jazz Chisholm Jr.|IF|BAH|84
+Salvador Pérez|C|VEN|83
+Tarik Skubal|P|USA|97
+Paul Skenes|P|USA|97
+Zack Wheeler|P|USA|93
+Garrett Crochet|P|USA|93
+Yoshinobu Yamamoto|P|JPN|92
+Chris Sale|P|USA|90
+Gerrit Cole|P|USA|90
+Jacob deGrom|P|USA|90
+Cristopher Sánchez|P|DOM|90
+Logan Gilbert|P|USA|89
+Hunter Greene|P|USA|89
+Edwin Díaz|P|PUR|89
+Mason Miller|P|USA|89
+Blake Snell|P|USA|88
+Framber Valdez|P|DOM|88
+Emmanuel Clase|P|DOM|88
+Josh Hader|P|USA|88
+Shota Imanaga|P|JPN|86
+Jacob Misiorowski|P|USA|86`)},
+videogame:{name:"Video game fights",noun:"character",roles:["HERO","ANTI","VILL"],judge:FIGHT+" Use what each character can do in their own games.",list:R(`
+Mario|HERO|Super Mario|86
+Luigi|HERO|Super Mario|80
+Bowser|VILL|Super Mario|88
+Wario|ANTI|Super Mario|72
+Link|HERO|Zelda|89
+Ganondorf|VILL|Zelda|92
+Princess Zelda|HERO|Zelda|86
+Samus Aran|HERO|Metroid|90
+Master Chief|HERO|Halo|91
+Kratos|ANTI|God of War|96
+Sonic|HERO|Sonic|88
+Shadow|ANTI|Sonic|89
+Dr. Eggman|VILL|Sonic|78
+Donkey Kong|HERO|Donkey Kong|82
+Kirby|HERO|Kirby|93
+Meta Knight|ANTI|Kirby|86
+Cloud Strife|HERO|Final Fantasy|90
+Sephiroth|VILL|Final Fantasy|94
+Doom Slayer|ANTI|Doom|97
+Steve|HERO|Minecraft|78
+Lara Croft|HERO|Tomb Raider|76
+Nathan Drake|HERO|Uncharted|72
+Arthur Morgan|ANTI|Red Dead Redemption|74
+Geralt of Rivia|ANTI|The Witcher|85
+Solid Snake|HERO|Metal Gear|80
+Ryu|HERO|Street Fighter|84
+Chun-Li|HERO|Street Fighter|80
+Akuma|VILL|Street Fighter|88
+Scorpion|ANTI|Mortal Kombat|86
+Sub-Zero|ANTI|Mortal Kombat|85
+Raiden|HERO|Mortal Kombat|90
+Shao Kahn|VILL|Mortal Kombat|91
+Dante|HERO|Devil May Cry|92
+Vergil|ANTI|Devil May Cry|92
+Bayonetta|ANTI|Bayonetta|93
+Agent 47|ANTI|Hitman|72
+Ezio Auditore|HERO|Assassin's Creed|75
+Kazuya Mishima|VILL|Tekken|86
+Mega Man|HERO|Mega Man|80
+Pac-Man|HERO|Pac-Man|70
+Crash Bandicoot|HERO|Crash Bandicoot|74
+Spyro|HERO|Spyro|75
+Ratchet & Clank|HERO|Ratchet & Clank|78
+Sora|HERO|Kingdom Hearts|91
+Xehanort|VILL|Kingdom Hearts|92
+Leon S. Kennedy|HERO|Resident Evil|74
+Albert Wesker|VILL|Resident Evil|84
+Nemesis|VILL|Resident Evil|82
+Aloy|HERO|Horizon|76
+Captain Falcon|HERO|F-Zero|82
+Fox McCloud|HERO|Star Fox|78
+Jonesy|HERO|Fortnite|70
+Sans|ANTI|Undertale|84
+Freddy Fazbear|VILL|Five Nights at Freddy's|66
+The Knight|HERO|Hollow Knight|83
+Isaac Clarke|HERO|Dead Space|73
+Marcus Fenix|HERO|Gears of War|77`)},
+starwars:{name:"Star Wars",noun:"character",roles:["JEDI","SITH","HERO","VILL","MERC"],judge:FIGHT+" Use what the characters have shown in Star Wars films, shows and games.",list:R(`
+Yoda|JEDI|Prequels|94
+Luke Skywalker|JEDI|Original trilogy|90
+Obi-Wan Kenobi|JEDI|Prequels|89
+Anakin Skywalker|JEDI|Prequels|93
+Mace Windu|JEDI|Prequels|90
+Qui-Gon Jinn|JEDI|Prequels|85
+Ahsoka Tano|JEDI|Clone Wars|87
+Rey|JEDI|Sequels|88
+Kit Fisto|JEDI|Clone Wars|80
+Plo Koon|JEDI|Clone Wars|81
+Cal Kestis|JEDI|Jedi games|84
+Kanan Jarrus|JEDI|Rebels|79
+Ezra Bridger|JEDI|Rebels|80
+Grogu|JEDI|The Mandalorian|76
+Darth Vader|SITH|Original trilogy|95
+Emperor Palpatine|SITH|Original trilogy|96
+Darth Maul|SITH|Prequels|87
+Count Dooku|SITH|Prequels|88
+Starkiller|SITH|The Force Unleashed|92
+Kylo Ren|SITH|Sequels|86
+Snoke|SITH|Sequels|89
+Asajj Ventress|SITH|Clone Wars|80
+Savage Opress|SITH|Clone Wars|79
+Baylan Skoll|SITH|Ahsoka|85
+Darth Revan|SITH|Knights of the Old Republic|93
+Han Solo|HERO|Original trilogy|74
+Princess Leia|HERO|Original trilogy|73
+Chewbacca|HERO|Original trilogy|74
+Lando Calrissian|HERO|Original trilogy|68
+Finn|HERO|Sequels|70
+Poe Dameron|HERO|Sequels|70
+Captain Rex|HERO|Clone Wars|76
+Sabine Wren|HERO|Rebels|74
+Cassian Andor|HERO|Andor|70
+R2-D2|HERO|Original trilogy|62
+General Grievous|VILL|Prequels|84
+Grand Admiral Thrawn|VILL|Rebels|82
+Grand Inquisitor|VILL|Rebels|80
+Moff Gideon|VILL|The Mandalorian|75
+Grand Moff Tarkin|VILL|Original trilogy|65
+Captain Phasma|VILL|Sequels|68
+Din Djarin|MERC|The Mandalorian|82
+Boba Fett|MERC|Original trilogy|80
+Jango Fett|MERC|Prequels|80
+Cad Bane|MERC|Clone Wars|79
+Bossk|MERC|Original trilogy|68
+IG-11|MERC|The Mandalorian|72
+Fennec Shand|MERC|The Book of Boba Fett|73
+Bo-Katan Kryze|MERC|The Mandalorian|76
+Aurra Sing|MERC|Clone Wars|72`)},
+pokemon:{name:"Pokémon",noun:"Pokémon",roles:["LEG","MYTH","PSEUDO","START","MON"],judge:"Judge a Pokémon team battle: each lineup battles every other lineup. Use each Pokémon's real stats, typing, moves and type matchups, and how well the team covers each other's weaknesses. Ratings are only a rough guide.",list:R(`
+Arceus|MYTH|Gen 4|99
+Mewtwo|LEG|Gen 1|97
+Rayquaza|LEG|Gen 3|97
+Eternatus|LEG|Gen 8|96
+Dialga|LEG|Gen 4|96
+Palkia|LEG|Gen 4|96
+Giratina|LEG|Gen 4|96
+Zacian|LEG|Gen 8|96
+Groudon|LEG|Gen 3|95
+Kyogre|LEG|Gen 3|95
+Necrozma|LEG|Gen 7|95
+Koraidon|LEG|Gen 9|95
+Miraidon|LEG|Gen 9|95
+Lugia|LEG|Gen 2|94
+Reshiram|LEG|Gen 5|94
+Zekrom|LEG|Gen 5|94
+Solgaleo|LEG|Gen 7|94
+Lunala|LEG|Gen 7|94
+Ho-Oh|LEG|Gen 2|93
+Kyurem|LEG|Gen 5|93
+Xerneas|LEG|Gen 6|93
+Yveltal|LEG|Gen 6|93
+Zygarde|LEG|Gen 6|93
+Zamazenta|LEG|Gen 8|93
+Mew|MYTH|Gen 1|92
+Deoxys|MYTH|Gen 3|91
+Darkrai|MYTH|Gen 4|90
+Celebi|MYTH|Gen 2|86
+Jirachi|MYTH|Gen 3|86
+Garchomp|PSEUDO|Gen 4|91
+Tyranitar|PSEUDO|Gen 2|90
+Metagross|PSEUDO|Gen 3|90
+Dragonite|PSEUDO|Gen 1|89
+Salamence|PSEUDO|Gen 3|89
+Hydreigon|PSEUDO|Gen 5|88
+Dragapult|PSEUDO|Gen 8|88
+Greninja|START|Gen 6|89
+Charizard|START|Gen 1|88
+Blaziken|START|Gen 3|87
+Swampert|START|Gen 3|86
+Infernape|START|Gen 4|86
+Blastoise|START|Gen 1|85
+Venusaur|START|Gen 1|85
+Sceptile|START|Gen 3|85
+Kingambit|MON|Gen 9|88
+Lucario|MON|Gen 4|87
+Gholdengo|MON|Gen 9|87
+Gengar|MON|Gen 1|86
+Gyarados|MON|Gen 1|86
+Scizor|MON|Gen 2|86
+Volcarona|MON|Gen 5|86
+Aegislash|MON|Gen 6|86
+Alakazam|MON|Gen 1|85
+Gardevoir|MON|Gen 3|85
+Togekiss|MON|Gen 4|85
+Snorlax|MON|Gen 1|84
+Mimikyu|MON|Gen 7|84
+Machamp|MON|Gen 1|83
+Pikachu|MON|Gen 1|80
+Lapras|MON|Gen 1|80
+Eevee|MON|Gen 1|62
+Magikarp|MON|Gen 1|40`)}
+};
+const GROUPS=[["Sports",["soccer","basketball","cricket","baseball"]],["Fights",["anime","mcu","dceu","starwars","videogame","pokemon"]],["Special",["mega","custom"]]];
+const BLURB={soccer:"Real footballers. Balance your keeper, defence, midfield and attack.",basketball:"NBA stars. Mix guards, wings and bigs.",cricket:"Test and white-ball stars. You need batting and bowling.",baseball:"MLB hitters and aces. Pitching wins.",anime:"Goku, Gojo, Luffy and more in a team battle.",mcu:"Marvel Cinematic Universe heroes and villains.",dceu:"DC film heroes, villains and the Suicide Squad.",starwars:"Jedi, Sith, rebels and bounty hunters.",videogame:"Mario, Master Chief, Kratos and the gang.",pokemon:"Legendaries, starters and fan favourites.",mega:"Every mode mixed into one giant pool.",custom:"Type your own list and decide how Claude judges."};
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const MEGA=[];for(const k in MODES)MODES[k].list.forEach(p=>MEGA.push({...p,nat:MODES[k].name}));
+for(const k in MODES)MODES[k].list.forEach((p,i)=>p.id=i);MEGA.forEach((p,i)=>p.id=i);
+const HOMEDECK=shuffle(MEGA.filter(p=>p.r>=84)).slice(0,6);
+const NAMES={...Object.fromEntries(Object.entries(MODES).map(([k,m])=>[k,m.name])),mega:"Mega mode",custom:"Custom"};
+const POWERS={steal:{name:"Steal",sym:"ST",desc:"Take one player from any manager."},block:{name:"Block",sym:"BL",desc:"Automatically stops a Steal or Swap aimed at you."},double:{name:"Double",sym:"×2",desc:"One of your players counts double when Claude judges."},swap:{name:"Swap",sym:"⇄",desc:"Swap one of your players for anyone else's. No saying no."}};
+const COLORS=["#ffd166","#ff6b6b","#4dabf7","#69db7c","#da77f2","#ff922b","#38d9a9","#f783ac","#a9e34b","#e9ecef"];
+const ICONS=["⚡","🔥","🦁","🐉","👑","🚀","💀","🦈","⭐","🌪️","🐺","🎯","🛡️","🍀","🤖","👾"];
+const PHASES=[["setup","Setup"],["auction","Auction"],["trade1","Trading"],["wild","Wildcards"],["trade2","Final trades"],["results","Results"]];
+const DEFAULTS={budget:100,squad:4,wild:3,timer:10,blind:0,mystery:0,powers:true};
+const MAXMGR=12;
+
+let MODE,P;
+function parseCustom(text){const seen=new Set(),out=[];for(const raw of String(text||"").split("\n")){const parts=raw.split(",").map(x=>x.trim()).filter(Boolean);if(!parts.length)continue;
+  let r=80,role="PICK";if(parts.length>1&&/^\d+$/.test(parts[parts.length-1])){r=Math.max(1,Math.min(99,+parts.pop()))}if(parts.length>1)role=parts.pop().slice(0,8).toUpperCase();
+  const name=parts.join(", ").slice(0,40);if(seen.has(name.toLowerCase()))continue;seen.add(name.toLowerCase());out.push({id:out.length,name,pos:role,nat:"Custom",r})}return out}
+function modeInfo(mode,custom){
+  if(mode==="custom"){const list=custom?.list||parseCustom(custom?.text);return{name:custom?.title?.trim()||"Custom",noun:"pick",roles:[...new Set(list.map(p=>p.pos))],judge:custom?.judge?.trim()||"Judge which lineup is best overall, using common sense and any real-world knowledge about the entries.",list}}
+  if(mode==="mega")return{name:"Mega mode",noun:"pick",roles:[...new Set(MEGA.map(p=>p.pos))],judge:"This is Mega mode: athletes, anime fighters, superheroes, Star Wars characters, video game characters and Pokémon are all mixed. Judge an all-out team showdown where anything goes: powers count, and real athletes rely on their physical skill. Be creative but sensible.",list:MEGA};
+  return MODES[mode]||MODES.soccer}
+function useGame(g){MODE=modeInfo(g?g.mode:"soccer",g?.custom);P=MODE.list}
+useGame(null);
+const val=(r,b=100)=>Math.max(1,Math.round(Math.min(60,Math.max(1,3+Math.max(0,r-74)**2*.15))*b/100));
+const tier=r=>r>=94?"legend":r>=87?"gold":r>=80?"silver":"bronze";
+const TIERC={bronze:"#c98a55",silver:"#c8d0d8",gold:"#f2c14e",legend:"#e7b6ff"};
+const roleIdx=pos=>Math.max(0,MODE.roles.indexOf(pos))%5;
+const maxM=g=>Math.min(MAXMGR,Math.floor((P.length-(g?.settings.wild||0))/(g?.settings.squad||4)));
+
+// ================= storage, online connection =================
+const LS={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const CFG=window.FIREBASE_CONFIG||null;
+const CFG_OK=!!(CFG&&CFG.apiKey&&CFG.databaseURL&&!/PASTE/i.test(CFG.apiKey+CFG.databaseURL));
+let fdb=null,uid=null,srvOff=0,netErr=null;
+let role=null,ME="local",CODE=null,offs=[];
+if(CFG_OK&&window.firebase){try{firebase.initializeApp(CFG);fdb=firebase.database();
+  firebase.auth().onAuthStateChanged(u=>{if(u){uid=u.uid;if(ui.screen==="home")render()}});
+  firebase.auth().signInAnonymously().catch(e=>{netErr="Couldn't sign in to Firebase ("+(e.code||e.message)+"). Is Anonymous sign-in turned on?";render()});
+  fdb.ref(".info/serverTimeOffset").on("value",s=>{srvOff=+s.val()||0})}catch(e){netErr="Firebase settings problem: "+(e.message||e);fdb=null}}
+else if(CFG_OK&&!window.firebase)netErr="Couldn't load Firebase. Check your internet connection.";
+const online=()=>!!(fdb&&uid);
+const serverNow=()=>Date.now()+(role==="local"?0:srvOff);
+const TS=()=>firebase.database.ServerValue.TIMESTAMP;
+
+// ================= rules (only the host's laptop runs these) =================
+function newGame(prev,host){return{id:Date.now(),host:host??prev?.host,code:prev?.code||null,mode:prev?.mode||"soccer",settings:{...(prev?.settings||DEFAULTS)},
+  custom:prev?.custom?{title:prev.custom.title,judge:prev.custom.judge,text:prev.custom.text}:{title:"",judge:"",text:""},
+  managers:(prev?.managers||[]).map(m=>({id:m.id,owner:m.owner,name:m.name,color:m.color,icon:m.icon,money:0,squad:[],powers:[]})),
+  phase:"setup",queue:[],requeued:[],used:[],lot:null,lotNo:0,lotTotal:0,round:"main",trades:[],doubled:{},log:[prev?"Rematch! Same managers, fresh draft.":"New game. Add your managers."],
+  record:null,lastSale:null,lastPower:null,verdict:null,notice:null,seq:prev?.seq||0}}
+const log=(s,t)=>{s.log.unshift(t);s.log.length=Math.min(s.log.length,60)};
+const canBuy=(s,m,amt)=>m.money>=amt&&(s.round!=="main"||m.squad.length<s.settings.squad);
+function eligible(s,m){const L=s.lot;return!!L&&!L.blind&&m.id!==L.leader&&!L.passed.includes(m.id)&&canBuy(s,m,L.bid+1)}
+const lotName=L=>L.k==="w"?POWERS[L.power].name+" card":P[L.pid].name;
+function nextLot(s){
+  if(!s.queue.length){s.lot=null;if(s.round==="main"){s.phase="trade1";log(s,"Auction over. The trading window is open.")}else{s.phase="trade2";log(s,"Wildcards done. Final trades, and power cards can be used now.")}return}
+  const it=s.queue.shift();s.lotNo++;
+  const blind=s.round==="main"&&s.settings.blind>0&&s.lotNo%s.settings.blind===0;
+  s.lot={k:it.k,pid:it.pid??null,power:it.power??null,bid:0,leader:null,passed:[],endsAt:0,blind,sealed:{},blindIds:[],mystery:it.k==="p"&&Math.random()<s.settings.mystery};
+  if(blind){s.lot.blindIds=s.managers.filter(m=>canBuy(s,m,1)).map(m=>m.id);if(!s.lot.blindIds.length)closeLot(s)}else settle(s)}
+function settle(s){if(!s.lot||s.lot.blind)return;if(s.managers.some(m=>eligible(s,m)))return;closeLot(s)}
+function closeLot(s){const L=s.lot,m=s.managers.find(x=>x.id===L.leader);
+  if(m){m.money-=L.bid;if(L.k==="p")m.squad.push(L.pid);else m.powers.push(L.power);
+    s.lastSale={n:s.seq,k:L.k,pid:L.pid,power:L.power,mid:m.id,amt:L.bid,mystery:L.mystery};
+    if(!s.record||L.bid>s.record.amt)s.record={k:L.k,pid:L.pid,power:L.power,mid:m.id,amt:L.bid};
+    log(s,`SOLD: ${lotName(L)}${L.mystery?" (mystery)":""} to ${m.name} for $${L.bid}.`)}
+  else if(s.round==="wild"||L.k==="w")log(s,`${lotName(L)} went unsold.`);
+  else if(!s.requeued.includes(L.pid)){s.requeued.push(L.pid);s.queue.push({k:"p",pid:L.pid});log(s,`No bids on ${L.mystery?"the mystery pick":P[L.pid].name}. Back of the queue.`)}
+  else{const o=s.managers.filter(x=>x.squad.length<s.settings.squad).sort((a,b)=>a.squad.length-b.squad.length||b.money-a.money)[0];if(o){o.squad.push(L.pid);log(s,`No bids again: ${P[L.pid].name} goes free to ${o.name}.`)}}
+  nextLot(s)}
+function resolveBlind(s){const L=s.lot,bids=L.blindIds.map(id=>({m:s.managers.find(x=>x.id===id),a:L.sealed[id]||0})).filter(x=>x.m).sort((a,b)=>b.a-a.a||b.m.money-a.m.money||Math.random()-.5);
+  log(s,"Blind bids: "+(bids.map(x=>`${x.m.name} ${x.a?"$"+x.a:"skip"}`).join(", ")||"none"));
+  if(bids[0]&&bids[0].a>0){L.leader=bids[0].m.id;L.bid=bids[0].a}closeLot(s)}
+function checkTrade(s,t){const f=s.managers.find(m=>m.id===t.from),o=s.managers.find(m=>m.id===t.to);
+  if(!f||!o||f===o)throw"Pick two different managers.";
+  for(const k of["give","get"])if(!Number.isInteger(t[k].m)||t[k].m<0)throw"Money must be a whole number.";
+  if(!t.give.p.length&&!t.give.m&&!t.get.p.length&&!t.get.m)throw"Add something to the deal first.";
+  if(t.give.p.some(id=>!f.squad.includes(id))||t.get.p.some(id=>!o.squad.includes(id)))throw"Some of those players have moved, so this deal no longer works.";
+  if(t.give.m>f.money)throw`${f.name} only has $${f.money}.`;if(t.get.m>o.money)throw`${o.name} only has $${o.money}.`;return[f,o]}
+function cleanName(s,name,selfId){name=String(name||"").trim().slice(0,18);if(!name)throw"Type a manager name.";
+  if(s.managers.some(m=>m.id!==selfId&&m.name.toLowerCase()===name.toLowerCase()))throw`The name "${name}" is taken. Pick another.`;return name}
+function reduce(S,a){const s=structuredClone(S);s.seq++;useGame(s);const now=serverNow(),M=id=>s.managers.find(m=>m.id===id),by=a.by,host=by===s.host;
+  const hostOnly=()=>{if(!host)throw"Only the host can do that."};
+  const inSetup=()=>{if(s.phase!=="setup")throw"That can only be done during setup."};
+  const own=m=>{if(!m)throw"That manager isn't in the game.";if(m.owner!==by)throw"You can only play for your own manager.";return m};
+  switch(a.type){
+  case"mode":hostOnly();inSetup();if(!NAMES[a.mode])throw"Unknown mode.";s.mode=a.mode;useGame(s);log(s,`Mode: ${MODE.name}.`);break;
+  case"setting":hostOnly();inSetup();if(!(a.key in DEFAULTS))break;s.settings[a.key]=a.val;break;
+  case"custom":hostOnly();inSetup();for(const k of["title","text","judge"])if(k in a.data)s.custom[k]=String(a.data[k]).slice(0,k==="text"?8000:200);break;
+  case"addM":{hostOnly();inSetup();if(s.managers.length>=MAXMGR)throw`${MAXMGR} managers is the most.`;const name=cleanName(s,a.name);
+    s.managers.push({id:"m"+s.seq,owner:by,name,color:a.color,icon:a.icon,money:0,squad:[],powers:[]});log(s,`${name} joined.`);break}
+  case"join":{if(s.phase!=="setup")throw"This game has already started, so you're watching.";const ex=!host&&s.managers.find(m=>m.owner===by);
+    if(ex){ex.name=cleanName(s,a.name,ex.id);ex.color=a.color;ex.icon=a.icon;break}
+    if(s.managers.length>=MAXMGR)throw"The game is full.";const name=cleanName(s,a.name);
+    s.managers.push({id:"m"+s.seq,owner:by,name,color:a.color,icon:a.icon,money:0,squad:[],powers:[]});log(s,`${name} joined online.`);break}
+  case"editM":{const m=M(a.mid);if(!m)break;if(!host&&m.owner!==by)throw"You can only change your own manager.";if(a.data.icon)m.icon=a.data.icon;if(a.data.color)m.color=a.data.color;break}
+  case"removeM":{hostOnly();inSetup();const m=M(a.mid);s.managers=s.managers.filter(x=>x.id!==a.mid);if(m)log(s,`${m.name} was removed.`);break}
+  case"start":{hostOnly();inSetup();if(s.mode==="custom"){s.custom.list=parseCustom(s.custom.text);useGame(s)}
+    const n=s.managers.length,need=n*s.settings.squad;if(n<2)throw"Add at least 2 managers.";
+    if(P.length<need)throw`${MODE.name} needs at least ${need} entries for ${n} managers (it has ${P.length}).`;
+    s.managers.forEach(m=>{m.money=s.settings.budget;m.squad=[];m.powers=[]});
+    const pool=shuffle(P.map(p=>p.id)).slice(0,need);s.used=[...pool];s.queue=pool.map(pid=>({k:"p",pid}));s.requeued=[];s.round="main";s.phase="auction";s.lotNo=0;s.lotTotal=pool.length;s.doubled={};s.trades=[];s.record=null;s.verdict=null;
+    log(s,`${MODE.name}: ${pool.length} ${MODE.noun}s up for auction. $${s.settings.budget} each, ${s.settings.squad} per squad.`);nextLot(s);break}
+  case"bid":{const L=s.lot,m=own(M(a.mid));if(!L)break;if(!eligible(s,m))throw m.id===L.leader?"You're already the top bidder.":"You can't bid on this one.";
+    L.bid=Math.min(m.money,L.bid+Math.max(1,Math.min(50,a.inc|0)));L.leader=m.id;L.endsAt=now+s.settings.timer*1000;log(s,`${m.name} bids $${L.bid}.`);settle(s);break}
+  case"pass":{const L=s.lot,m=own(M(a.mid));if(!L||m.id===L.leader)break;if(!L.passed.includes(m.id))L.passed.push(m.id);settle(s);break}
+  case"seal":{const L=s.lot,m=own(M(a.mid));if(!L||!L.blind||!L.blindIds.includes(m.id)||m.id in L.sealed)break;const amt=a.amount|0;
+    if(amt<0||amt>m.money)throw`You can bid between $0 and $${m.money}.`;L.sealed[m.id]=amt;
+    if(L.blindIds.every(id=>id in L.sealed))resolveBlind(s);break}
+  case"timeout":{const L=s.lot;if(L&&!L.blind&&L.leader&&now>=L.endsAt)closeLot(s);break}
+  case"sell":{hostOnly();const L=s.lot;if(!L)break;if(L.blind)resolveBlind(s);else closeLot(s);break}
+  case"propose":{if(!["trade1","trade2"].includes(s.phase))throw"Trading isn't open.";own(M(a.t.from));
+    const t={id:"t"+s.seq,from:a.t.from,to:a.t.to,give:{p:[...a.t.give.p].map(Number),m:a.t.give.m|0},get:{p:[...a.t.get.p].map(Number),m:a.t.get.m|0},status:"open",counterOf:a.t.counterOf||null};
+    const[f,o]=checkTrade(s,t);if(t.counterOf){const old=s.trades.find(x=>x.id===t.counterOf);if(old&&old.status==="open")old.status="countered"}
+    s.trades.push(t);log(s,`${f.name} ${t.counterOf?"sent a counter-offer to":"sent an offer to"} ${o.name}.`);break}
+  case"respond":{const t=s.trades.find(x=>x.id===a.tid);if(!t||t.status!=="open")throw"That offer is closed.";own(M(t.to));
+    if(!a.accept){t.status="declined";log(s,`${M(t.to).name} declined ${M(t.from).name}'s offer.`);break}
+    let f,o;try{[f,o]=checkTrade(s,t)}catch(e){t.status="void";throw e}
+    f.squad=f.squad.filter(id=>!t.give.p.includes(id)).concat(t.get.p);o.squad=o.squad.filter(id=>!t.get.p.includes(id)).concat(t.give.p);
+    f.money+=t.get.m-t.give.m;o.money+=t.give.m-t.get.m;t.status="done";log(s,`DEAL DONE: ${f.name} ⇄ ${o.name}. No going back!`);break}
+  case"cancel":{const t=s.trades.find(x=>x.id===a.tid);if(!t||t.status!=="open")break;own(M(t.from));t.status="cancelled";break}
+  case"power":{if(s.phase!=="trade2")throw"Power cards are used in the final trading round.";const m=own(M(a.mid)),t=M(a.target);
+    if(!m.powers.includes(a.power))throw"You don't have that card.";const use=()=>m.powers.splice(m.powers.indexOf(a.power),1);
+    if(a.power==="double"){if(!m.squad.includes(a.pid))throw"Pick one of your own players.";use();s.doubled[a.pid]=true;log(s,`${m.name} played DOUBLE on ${P[a.pid].name}.`);s.lastPower={n:s.seq,txt:`${P[a.pid].name} now counts double!`};break}
+    if(!t||t===m)throw"Pick a target manager.";
+    if(a.power==="steal"&&!t.squad.includes(a.pid))throw"Pick one of their players.";
+    if(a.power==="swap"&&(!t.squad.includes(a.pid2)||!m.squad.includes(a.pid)))throw"Pick one of your players and one of theirs.";
+    use();if(t.powers.includes("block")){t.powers.splice(t.powers.indexOf("block"),1);log(s,`${t.name} BLOCKED ${m.name}'s ${POWERS[a.power].name}!`);s.lastPower={n:s.seq,txt:`Blocked! ${t.name} stopped the ${POWERS[a.power].name}.`};break}
+    if(a.power==="steal"){t.squad=t.squad.filter(x=>x!==a.pid);m.squad.push(a.pid);log(s,`${m.name} STOLE ${P[a.pid].name} from ${t.name}!`);s.lastPower={n:s.seq,txt:`${m.name} stole ${P[a.pid].name}!`}}
+    else{m.squad=m.squad.filter(x=>x!==a.pid).concat(a.pid2);t.squad=t.squad.filter(x=>x!==a.pid2).concat(a.pid);log(s,`${m.name} SWAPPED ${P[a.pid].name} for ${t.name}'s ${P[a.pid2].name}!`);s.lastPower={n:s.seq,txt:`Swap! ${P[a.pid2].name} joins ${m.name}.`}}
+    break}
+  case"next":{hostOnly();s.trades.forEach(t=>{if(t.status==="open")t.status="cancelled"});
+    if(s.phase==="trade1"){const left=P.filter(p=>!s.used.includes(p.id)).sort((x,y)=>y.r-x.r).slice(0,30).map(p=>p.id);
+      const w=shuffle(left).slice(0,s.settings.wild);s.used.push(...w);
+      s.queue=shuffle([...w.map(pid=>({k:"p",pid})),...(s.settings.powers?Object.keys(POWERS).map(power=>({k:"w",power})):[])]);
+      s.round="wild";s.phase="wild";s.lotNo=0;s.lotTotal=s.queue.length;log(s,"Wildcard round: extra players and power cards, bought with leftover money. No squad limit.");nextLot(s)}
+    else if(s.phase==="trade2"){s.phase="results";log(s,"The window has closed. Over to Claude.")}break}
+  case"verdict":hostOnly();s.verdict=a.verdict;break;
+  default:throw"Unknown move."}
+  return s}
+
+// ================= sound =================
+const SFX={ctx:null,muted:!!LS.get("tw-mute"),
+  init(){if(this.ctx)return;try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
+  tone(f,d,type="sine",v=.15,w=0){if(this.muted||!this.ctx)return;try{const c=this.ctx,t=c.currentTime+w,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(c.destination);o.start(t);o.stop(t+d+.02)}catch(e){}},
+  noise(d,v=.3,w=0,f=800){if(this.muted||!this.ctx)return;try{const c=this.ctx,t=c.currentTime+w,b=c.createBuffer(1,Math.ceil(c.sampleRate*d),c.sampleRate),ch=b.getChannelData(0);for(let i=0;i<ch.length;i++)ch[i]=Math.random()*2-1;
+    const src=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();src.buffer=b;fl.type="lowpass";fl.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);src.connect(fl).connect(g).connect(c.destination);src.start(t)}catch(e){}},
+  bid(){this.tone(660,.08,"square",.05);this.tone(990,.1,"square",.045,.06)},
+  tick(){this.tone(1300,.05,"square",.05)},
+  flip(){this.noise(.16,.12,0,3500)},
+  sold(){this.noise(.12,.6,0,350);this.tone(80,.3,"sine",.45);[523,659,784,1047].forEach((f,i)=>this.tone(f,.28,"triangle",.11,.18+i*.08))},
+  power(){[392,523,784].forEach((f,i)=>this.tone(f,.2,"sawtooth",.05,i*.07))},
+  drum(d){for(let t=0;t<d;t+=.055)this.noise(.05,.12+.2*t/d,t,700);this.noise(.4,.6,d,300)},
+  fanfare(){[523,659,784,1047,784,1047].forEach((f,i)=>this.tone(f,.32,"triangle",.13,i*.13))}};
+addEventListener("pointerdown",()=>SFX.init(),{once:true});
+
+// ================= state & helpers =================
+const PROFILE=LS.get("tw-profile")||{};
+const saveProfile=(name)=>{PROFILE.name=name;PROFILE.color=ui.newM.color;PROFILE.icon=ui.newM.icon;LS.set("tw-profile",PROFILE)};
+let G=null,shownSale=0,shownPower=0,lastLotKey=null,lastBidKey,seenVerdict=null,seenNotice=0;
+const ui={roster:false,previewMode:null,rq:"",rrole:"",td:null,pw:{},reveal:null,typePos:Infinity,typeFor:null,leaveArm:false,newM:{color:PROFILE.color||COLORS[Math.floor(Math.random()*COLORS.length)],icon:PROFILE.icon||ICONS[Math.floor(Math.random()*ICONS.length)]},screen:"home",coinPrev:{}};
+const JOIN=(new URLSearchParams(location.search).get("join")||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,5);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,3600)}
+const Mby=id=>G.managers.find(m=>m.id===id);
+const mine=m=>!!m&&m.owner===ME;
+const myMs=()=>G?G.managers.filter(mine):[];
+const amHost=()=>!!G&&G.host===ME&&role!=="guest";
+const badge=(m,s)=>`<span class="badge ${s?"s":""}" style="--c:${esc(m.color)}" aria-hidden="true">${esc(m.icon)}</span>`;
+const you=m=>role!=="local"&&mine(m)?'<span class="youtag">You</span>':"";
+function syncSeen(){shownSale=G?.lastSale?.n||0;shownPower=G?.lastPower?.n||0;seenVerdict=G?.verdict?G.id:null;lastLotKey=G?.lot?`${G.id}:${G.round}:${G.lotNo}`:null;lastBidKey=undefined;seenNotice=G?.notice?.n||0;ui.typeFor=null;ui.reveal=null}
+
+// ---- syncing ----
+let writing=false,dirty=false;
+async function pushState(){if(role!=="host"||!online()||!CODE)return;if(writing){dirty=true;return}writing=true;
+  try{await fdb.ref(`games/${CODE}/state`).set({host:uid,s:JSON.stringify(G),t:TS()})}catch(e){toast("Couldn't save the game online. Check your internet.")}
+  writing=false;if(dirty){dirty=false;pushState()}}
+function commit(){if(role==="local")LS.set("tw-game",G);else pushState();render()}
+function act(a){a.by=ME;try{G=reduce(G,a);commit()}catch(e){toast(typeof e==="string"?e:"Something went wrong.");if(typeof e!=="string")console.error(e)}}
+function dispatch(a){if(!G)return;if(role==="guest"){a.by=ME;fdb.ref(`games/${CODE}/actions`).push({by:uid,a:JSON.stringify(a),t:TS()}).catch(()=>toast("Couldn't reach the game. Check your internet."))}else act(a)}
+function leaveNet(){offs.forEach(f=>{try{f()}catch(e){}});offs=[]}
+function watchActions(){const ref=fdb.ref(`games/${CODE}/actions`);
+  const h=snap=>{const v=snap.val();snap.ref.remove().catch(()=>{});if(!v||!G)return;let a;try{a=JSON.parse(v.a)}catch(e){return}a.by=v.by;
+    try{G=reduce(G,a)}catch(e){G={...G,seq:G.seq+1,notice:{to:v.by,msg:typeof e==="string"?e:"That move didn't work.",n:G.seq+1}};if(typeof e!=="string")console.error(e)}commit()};
+  ref.on("child_added",h,()=>toast("Lost the connection to your game."));offs.push(()=>ref.off("child_added",h))}
+function watchState(){const ref=fdb.ref(`games/${CODE}/state`);
+  const h=snap=>{const v=snap.val();if(!v)return;let g;try{g=JSON.parse(v.s)}catch(e){return}G=g;
+    if(G.notice&&G.notice.to===uid&&G.notice.n>seenNotice){seenNotice=G.notice.n;toast(G.notice.msg)}
+    if(ui.screen==="game")render()};
+  ref.on("value",h,()=>toast("Lost the connection to the game."));offs.push(()=>ref.off("value",h))}
+const genCode=()=>Array.from({length:5},()=>"ABCDEFGHJKLMNPQRSTUVWXYZ"[Math.floor(Math.random()*24)]).join("");
+async function hostOnline(){if(!online())return toast("Online play isn't connected yet.");
+  try{let code,tries=0;do{code=genCode();const s=await fdb.ref(`games/${code}/state`).get();if(!s.exists())break}while(++tries<6);
+    leaveNet();role="host";ME=uid;CODE=code;G=newGame(null,uid);G.code=code;syncSeen();LS.set("tw-session",{code});
+    watchActions();await pushState();ui.screen="game";ui.td=null;ui.pw={};render();scrollTo(0,0)}
+  catch(e){console.error(e);toast("Couldn't create the game. Check the Firebase rules (README step 3).")}}
+async function joinOnline(code,profile){if(!online())return toast("Online play isn't connected yet.");
+  code=String(code||"").trim().toUpperCase();if(!/^[A-Z]{5}$/.test(code))return toast("Game codes are 5 letters.");
+  let snap;try{snap=await fdb.ref(`games/${code}/state`).get()}catch(e){return toast("Couldn't check that code. Check your internet.")}
+  if(!snap.exists())return toast(`No game found with code ${code}.`);
+  const v=snap.val();let g;try{g=JSON.parse(v.s)}catch(e){return toast("That game couldn't be loaded.")}
+  leaveNet();CODE=code;ME=uid;G=g;syncSeen();LS.set("tw-session",{code});ui.td=null;ui.pw={};
+  if(v.host===uid){role="host";watchActions()}
+  else{role="guest";watchState();if(profile&&G.phase==="setup"&&!G.managers.some(m=>m.owner===uid))dispatch({type:"join",...profile});
+    else if(profile&&G.phase!=="setup"&&!G.managers.some(m=>m.owner===uid))toast("This game already started, so you're watching.")}
+  ui.screen="game";render();scrollTo(0,0)}
+function startLocal(resume){leaveNet();role="local";ME="local";CODE=null;G=resume?LS.get("tw-game"):newGame(null,"local");if(!G)G=newGame(null,"local");syncSeen();ui.screen="game";ui.td=null;ui.pw={};LS.set("tw-game",G);render();scrollTo(0,0)}
+function goHome(){leaveNet();ui.screen="home";role=null;G=null;ui.leaveArm=false;render();scrollTo(0,0)}
+
+// confetti
+const fx=document.getElementById("fx"),fxc=fx.getContext("2d");let parts=[],fxOn=false;
+function confetti(colors,n=160){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;fx.width=innerWidth;fx.height=innerHeight;
+  for(let i=0;i<n;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*.45,vx:(Math.random()-.5)*14,vy:-Math.random()*16-4,s:5+Math.random()*7,c:colors[i%colors.length],r:Math.random()*6,vr:(Math.random()-.5)*.4,life:1});
+  if(!fxOn){fxOn=true;requestAnimationFrame(fxLoop)}}
+function fxLoop(){fxc.clearRect(0,0,fx.width,fx.height);parts=parts.filter(p=>p.life>0&&p.y<fx.height+20);
+  for(const p of parts){p.vy+=.45;p.x+=p.vx;p.y+=p.vy;p.vx*=.99;p.r+=p.vr;p.life-=.006;fxc.save();fxc.translate(p.x,p.y);fxc.rotate(p.r);fxc.globalAlpha=Math.max(0,p.life);fxc.fillStyle=p.c;fxc.fillRect(-p.s/2,-p.s/3,p.s,p.s*.66);fxc.restore()}
+  if(parts.length)requestAnimationFrame(fxLoop);else{fxOn=false;fxc.clearRect(0,0,fx.width,fx.height)}}
+
+// ================= view pieces =================
+function cardHTML(p,o={}){if(o.power){const w=POWERS[o.power];return`<div class="card power ${o.cls||""}" id="${o.id||""}"><span class="tier">Power card</span><span class="pw">${esc(w.sym)}</span><span class="nm">${w.name}</span><p class="small">${w.desc}</p></div>`}
+  if(o.mystery)return`<div class="card mystery ${o.cls||""}" id="${o.id||""}"><span class="tier">Mystery</span><span class="big">?</span><span class="nm">Mystery ${esc(MODE.noun)}</span><p class="small muted">Who is it? You'll find out when it's sold.</p></div>`;
+  const t=tier(p.r);return`<div class="card ${t} ${o.cls||""}" id="${o.id||""}"><span class="tier">${o.label||t}</span><span class="rt">${p.r}</span><span class="nm">${esc(p.name)}</span>
+  <div class="meta"><span>${esc(p.pos)}</span><span>${esc(p.nat)}</span>${o.guide?`<span>Guide $${val(p.r,G?.settings.budget)}</span>`:""}</div></div>`}
+const pchip=id=>{const p=P[id];if(!p)return"";return`<span class="pc ${tier(p.r)}" title="${esc(p.name)} · ${esc(p.pos)} · ${esc(p.nat)}"><span class="r">${p.r}</span>${esc(p.name)}${G.doubled[id]?'<span class="x2">×2</span>':""}</span>`};
+function lineup(m){if(!m.squad.length)return`<span class="empty">No ${MODE.noun}s yet</span>`;
+  const sq=[...m.squad].sort((a,b)=>roleIdx(P[a].pos)-roleIdx(P[b].pos)||P[b].r-P[a].r);
+  if(G.mode==="soccer"){const rows=["FWD","MID","DEF","GK"].map(r=>`<div class="ln">${sq.filter(id=>P[id].pos===r).map(pchip).join("")}</div>`).join("");return`<div class="pitch">${rows}</div>`}
+  return`<div class="chips">${sq.map(pchip).join("")}</div>`}
+function sheets(){return`<div class="squads">${G.managers.map(m=>{const avg=m.squad.length?Math.round(m.squad.reduce((x,id)=>x+P[id].r,0)/m.squad.length):0;
+  return`<div class="sheet" style="--c:${esc(m.color)}"><header>${badge(m,1)}<span class="nm">${esc(m.name)}${you(m)}</span><span class="coin" data-coin="${m.id}" data-v="${m.money}">$${m.money}</span></header>
+  <span class="lbl">${m.squad.length} ${MODE.noun}${m.squad.length===1?"":"s"}${avg?` · avg ${avg}`:""}</span>${lineup(m)}
+  ${m.powers.length?`<div class="row">${m.powers.map(p=>`<span class="pw-tag">${POWERS[p].name}</span>`).join("")}</div>`:""}</div>`}).join("")}</div>`}
+function topbar(){const i=PHASES.findIndex(p=>p[0]===G.phase);
+  return`<div class="bar"><div class="row" style="gap:14px"><span class="brand">Transfer <span>Window</span></span><span class="pw-tag">${esc(MODE.name)}</span>
+    ${CODE?`<span class="pw-tag">Game ${esc(CODE)}</span><button class="ghost sm" data-a="copylink">Copy invite link</button>`:""}</div>
+  <div class="steps">${PHASES.map((p,j)=>`<span class="${j===i?"on":j<i?"done":""}">${p[1]}</span>`).join("")}</div>
+  <div class="row"><button class="ghost sm" data-a="roster">${esc(MODE.noun)} list</button><button class="ghost sm" data-a="mute">${SFX.muted?"Sound off":"Sound on"}</button>
+  <button class="ghost sm" data-a="home">${ui.leaveArm?(amHost()&&role==="host"?"Leave? Game pauses":"Click again to leave"):"Home"}</button></div></div>`}
+const feed=()=>`<div class="panel"><span class="lbl">Match feed</span><div class="log">${G.log.map(l=>`<div>${esc(l)}</div>`).join("")}</div></div>`;
+const footer=()=>`<p class="credit">Made by <b>Harry Sujivan</b></p>`;
+const watchingNote=()=>role==="guest"&&!myMs().length?`<div class="panel"><p><b>You're watching.</b> <span class="muted">You don't have a manager in this game, but you can follow along live.</span></p></div>`:"";
+
+// ---------- home ----------
+const SWATCH={soccer:"linear-gradient(135deg,#145a3b,#0e3a28)",basketball:"linear-gradient(135deg,#8a4a1e,#3a1f10)",cricket:"linear-gradient(135deg,#2f6b2a,#1d3b1a)",baseball:"linear-gradient(135deg,#1d3d78,#0f1f3d)",anime:"linear-gradient(135deg,#5b2a9e,#1a1036)",mcu:"linear-gradient(135deg,#8c1a24,#2a0a0e)",dceu:"linear-gradient(135deg,#1f4a8c,#0c1424)",starwars:"linear-gradient(135deg,#2a2f4a,#05060c)",videogame:"linear-gradient(135deg,#4a2a8c,#120a24)",pokemon:"linear-gradient(135deg,#d42a3e,#8f1022)",mega:"linear-gradient(135deg,#ff9f1c,#6a2c91,#2ec4b6)",custom:"linear-gradient(135deg,#3a4048,#1c1f24)"};
+const pickers=()=>`<span class="lbl">Colour</span><div class="swatches">${COLORS.map(c=>`<button type="button" class="sw ${ui.newM.color===c?"on":""}" style="--c:${c}" data-a="ncolor" data-v="${c}" aria-label="Colour ${c}"></button>`).join("")}</div>
+  <span class="lbl">Badge</span><div class="icons">${ICONS.map(i=>`<button type="button" class="ic ${ui.newM.icon===i?"on":""}" data-a="nicon" data-v="${i}">${i}</button>`).join("")}</div>`;
+function netNote(){if(!CFG_OK)return`<p class="netnote">Online play isn't set up yet. Add your Firebase settings to <b>firebase-config.js</b> (see the README). You can still play on one laptop.</p>`;
+  if(netErr)return`<p class="netnote err">${esc(netErr)}</p>`;if(!uid)return`<p class="netnote">Connecting to online play…</p>`;return`<p class="netnote">Online play is ready. Each player uses their own laptop.</p>`}
+function home(){const saved=LS.get("tw-game"),sess=LS.get("tw-session"),wins=Object.entries(LS.get("tw-wins")||{}).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const pos=[[4,8,-8],[46,0,6],[22,40,-3],[64,34,9],[8,62,4],[50,64,-6]];
+  const word=(w,d)=>[...w].map((c,i)=>`<i style="animation-delay:${d+i*.05}s">${c}</i>`).join("");
+  return`<div class="bar"><span></span><button class="ghost sm" data-a="mute">${SFX.muted?"Sound off":"Sound on"}</button></div>
+  <section class="hero"><div style="display:flex;flex-direction:column;gap:20px">
+    <h1 class="title"><span class="w">${word("Transfer",0)}</span><span class="w">${word("Window",.4)}</span></h1>
+    <p class="tag">Bid against the clock, trade like a shark, play power cards, then let Claude crown the champion.</p>
+    <div class="row"><button class="acc-b big" data-a="hostgame" ${online()?"":"disabled"}>Host online game</button><button class="ghost big" data-a="local">Play on one laptop</button></div>
+    ${netNote()}
+    ${sess||saved?`<div class="row">${sess?`<button class="ghost sm" data-a="rejoin" ${online()?"":"disabled"}>Rejoin game ${esc(sess.code)}</button>`:""}${saved?`<button class="ghost sm" data-a="resumeLocal">Resume one-laptop game</button>`:""}</div>`:""}
+    <p class="credit" style="text-align:left">Made by <b>Harry Sujivan</b></p></div>
+    <div class="deck" aria-hidden="true">${HOMEDECK.map((p,i)=>`<div class="card ${tier(p.r)} ${i%2?"spin":""}" style="left:${pos[i][0]}%;top:${pos[i][1]}%;rotate:${pos[i][2]}deg;animation-delay:${i*.7}s"><span class="tier">${tier(p.r)}</span><span class="rt">${p.r}</span><span class="nm">${esc(p.name)}</span><div class="meta"><span>${esc(p.nat)}</span></div></div>`).join("")}</div></section>
+  <section class="panel" id="joinbox"><h2>Join a friend's game</h2><form id="f-join" class="joingrid">
+    <div class="field"><label class="lbl" for="j-code">Game code</label><input id="j-code" class="codein" maxlength="5" placeholder="ABCDE" autocomplete="off" value="${esc(JOIN)}" data-keep>
+      <label class="lbl" for="j-name">Your manager name</label><input id="j-name" maxlength="18" placeholder="e.g. Red Devils" data-keep value="${esc(PROFILE.name||"")}">
+      <button type="submit" class="acc-b" ${online()?"":"disabled"}>Join game</button></div>
+    <div class="field">${pickers()}</div></form></section>
+  <section class="panel"><h2>How to play</h2><div class="howto">${[["Set up","The host picks a mode and rules. Friends join with the game code on their own laptops."],["Auction","After each bid, everyone else has a few seconds to beat it or it's sold."],["Trade","Swap players, money or both. Counter-offers allowed. Deals are final."],["Wildcards","Extra stars and power cards (Steal, Block, Double, Swap) go up for auction."],["Final trades","Last chance to deal, and the moment to play your power cards."],["Claude judges","Everyone's best lineup is judged. Claude names the winner and the MVP, and calls the action."]].map((s,i)=>`<div class="st"><span class="num">${i+1}</span><h3>${s[0]}</h3><p class="small muted">${s[1]}</p></div>`).join("")}</div></section>
+  <section class="panel"><h2>Game modes</h2><p class="muted small">Click a mode to see everyone in it.</p><div class="modes">${GROUPS.flatMap(g=>g[1]).map(k=>`<button class="mode" data-a="preview" data-mode="${k}" style="background:${SWATCH[k]}"><b>${esc(NAMES[k])}</b><span>${esc(BLURB[k])}</span><em>${k==="custom"?"Your own list":`See all ${modeInfo(k).list.length}`}</em></button>`).join("")}</div></section>
+  ${wins.length?`<section class="panel"><h2>Hall of fame</h2><div class="lb">${wins.map(([n,w],i)=>`<b>${i+1}</b><span>${esc(n)}</span><span class="acc">${w} win${w===1?"":"s"}</span>`).join("")}</div></section>`:""}
+  ${footer()}`}
+
+// ---------- setup ----------
+const SETS=[["budget","Budget",[[50,"$50"],[100,"$100"],[150,"$150"],[200,"$200"]]],["squad","Squad size",[[3,"3"],[4,"4"],[5,"5"],[6,"6"]]],["timer","Bid timer",[[5,"5 seconds"],[10,"10 seconds"],[15,"15 seconds"]]],
+  ["wild","Wildcard players",[[0,"None"],[1,"1"],[2,"2"],[3,"3"],[4,"4"],[5,"5"]]],["powers","Power cards",[[true,"On"],[false,"Off"]]],["blind","Blind bid rounds",[[0,"Off"],[5,"Every 5th lot"],[3,"Every 3rd lot"]]],["mystery","Mystery players",[[0,"Off"],[.15,"Some"],[.3,"Lots"]]]];
+function setup(){const s=G.settings,mx=maxM(G),host=amHost(),custom=G.mode==="custom";
+  const managers=`<div style="display:flex;flex-direction:column;gap:6px">${G.managers.map(m=>`<div class="mgr">${badge(m)}<div><b>${esc(m.name)}</b>${you(m)}${role!=="local"&&m.owner!==G.host?' <span class="lbl">online</span>':""}</div><div class="row">${host||mine(m)?`<button class="ghost sm" data-a="cyc" data-mid="${m.id}">Badge</button>`:""}${host?`<button class="ghost sm" data-a="removeM" data-mid="${m.id}">Remove</button>`:""}</div></div>`).join("")||'<span class="empty">No managers yet.</span>'}</div>`;
+  if(!host){return`<div class="setup"><div class="col"><div class="panel"><span class="lbl">Game mode</span><h2>${esc(MODE.name)}</h2><p class="muted">${esc(BLURB[G.mode])}</p>
+      <div class="row between"><span class="small muted">${P.length} ${esc(MODE.noun)}s</span><button class="ghost" data-a="roster" ${P.length?"":"disabled"}>View all ${esc(MODE.noun)}s</button></div></div>
+    <div class="panel"><h2>Rules</h2><div class="sets">${SETS.map(([k,l,o])=>`<div class="kv"><span class="lbl">${l}</span><b>${esc((o.find(x=>String(x[0])===String(s[k]))||[0,s[k]])[1])}</b></div>`).join("")}</div></div></div>
+    <div class="col">${watchingNote()}<div class="panel"><h2>Managers (${G.managers.length})</h2>${managers}<p class="muted">Waiting for the host to start the auction…</p></div>${feed()}</div></div>`}
+  const sel=(k,opts)=>`<select id="set-${k}" data-set="${k}">${opts.map(([v,l])=>`<option value="${v}" ${String(s[k])===String(v)?"selected":""}>${l}</option>`).join("")}</select>`;
+  return`<div class="setup"><div class="col">
+    ${CODE?`<div class="panel"><span class="lbl">Game code</span><div class="codebig">${esc(CODE)}</div><p class="small muted">Friends open this website, type the code under "Join a friend's game", or use the invite link. Keep this tab open: your laptop runs the game.</p><div class="row"><button data-a="copylink">Copy invite link</button></div></div>`:""}
+    <div class="panel"><div class="field"><label class="lbl" for="mode-sel">Game mode</label>
+      <select id="mode-sel" style="font-size:1.1rem">${GROUPS.map(([g,ks])=>`<optgroup label="${g}">${ks.map(k=>`<option value="${k}" ${G.mode===k?"selected":""}>${esc(NAMES[k])}</option>`).join("")}</optgroup>`).join("")}</select></div>
+      <p class="muted">${esc(BLURB[G.mode])}</p>
+      ${custom?`<div class="field"><label class="lbl" for="c-title">Name your mode</label><input id="c-title" maxlength="30" value="${esc(G.custom.title)}" placeholder="e.g. Best snacks ever" data-keep></div>
+        <div class="field"><label class="lbl" for="c-text">Your list (one per line: Name, or Name, Role, Rating)</label><textarea id="c-text" placeholder="Pizza, Savoury, 92&#10;Tim Tams, Sweet, 88&#10;Sushi" data-keep>${esc(G.custom.text)}</textarea></div>
+        <div class="field"><label class="lbl" for="c-judge">How should Claude judge?</label><input id="c-judge" maxlength="200" value="${esc(G.custom.judge)}" placeholder="e.g. Which lineup makes the best meal" data-keep></div>`:""}
+      <div class="row between"><span class="small muted">${P.length} ${esc(MODE.noun)}s in this mode${mx>=2?` · up to ${mx} managers`:""}</span><button class="ghost" data-a="roster" ${P.length?"":"disabled"}>View all ${esc(MODE.noun)}s</button></div></div>
+    <div class="panel"><h2>Rules</h2><div class="sets">${SETS.map(([k,l,o])=>`<div class="field"><label class="lbl" for="set-${k}">${l}</label>${sel(k,o)}</div>`).join("")}</div></div></div>
+    <div class="col"><div class="panel"><h2>Managers (${G.managers.length})</h2>
+      <form id="f-add" class="field"><label class="lbl" for="m-name">${CODE?"Add a manager on this laptop (you, or someone sharing it)":"Add a manager"}</label><div class="row"><input id="m-name" maxlength="18" placeholder="e.g. Harry FC" style="flex:1" data-keep value="${myMs().length?"":esc(PROFILE.name||"")}"><button type="submit" class="acc-b">Add</button></div>${pickers()}</form>
+      ${managers}
+      <button class="acc-b big" data-a="start" ${G.managers.length<2?"disabled":""}>Start auction${G.managers.length>=2?` · ${G.managers.length*s.squad} ${esc(MODE.noun)}s`:""}</button>
+      ${mx<G.managers.length&&P.length?`<p class="small" style="color:var(--accent2)">This mode fits ${mx} managers with these rules. Lower the squad size or remove someone.</p>`:""}
+    </div>${feed()}</div></div>`}
+
+// ---------- roster ----------
+function roster(){const info=G&&ui.screen==="game"?MODE:modeInfo(ui.previewMode||"soccer"),list0=info.list,inGame=!!G&&ui.screen==="game"&&G.phase!=="setup";
+  const owner={};if(inGame)G.managers.forEach(m=>m.squad.forEach(id=>owner[id]=m));
+  const inDraft=new Set(inGame?G.used:[]),q=ui.rq.toLowerCase();
+  const list=list0.filter(p=>(!q||p.name.toLowerCase().includes(q)||p.nat.toLowerCase().includes(q))&&(!ui.rrole||p.pos===ui.rrole)).sort((a,b)=>b.r-a.r);
+  const roles=info.roles.length<=12?info.roles:[];
+  return`<div class="modal" data-a="closeR"><div class="panel" data-stop="1"><div class="row between"><h2>${esc(info.name)}: all ${list0.length} ${esc(info.noun)}s</h2><button class="ghost" data-a="closeR">Close</button></div>
+  ${list0.length?`<div class="row"><input id="rq" placeholder="Search names or teams" value="${esc(ui.rq)}" style="flex:1;min-width:200px">
+  ${roles.length>1?`<button class="sm ${ui.rrole?"ghost":"acc-b"}" data-a="rrole" data-v="">All</button>${roles.map(r=>`<button class="sm ${ui.rrole===r?"acc-b":"ghost"}" data-a="rrole" data-v="${esc(r)}">${esc(r)}</button>`).join("")}`:""}</div>
+  <p class="small muted">${inGame?"Faded = not in this draft. Owned ones show their manager's badge.":"Each game draws a random selection from this list. Ratings are rough guides."}</p>
+  <div class="rgrid">${list.map(p=>{const o=owner[p.id];return`<div class="ritem ${inGame&&!inDraft.has(p.id)?"gone":""}" style="--tc:${TIERC[tier(p.r)]}"><span class="rr">${p.r}</span><div style="min-width:0"><div class="n">${esc(p.name)}</div><div class="t">${esc(p.pos)} · ${esc(p.nat)}</div></div>${o?badge(o,1):""}</div>`}).join("")||'<span class="empty">No matches.</span>'}</div>`
+  :'<p class="muted">Custom mode uses the list the host types in during setup.</p>'}</div></div>`}
+
+// ---------- auction ----------
+function auction(){const L=G.lot;if(!L)return"";const p=L.k==="p"?P[L.pid]:null,lead=L.leader&&Mby(L.leader),wild=G.round==="wild",host=amHost();
+  const card=cardHTML(p,{power:L.k==="w"?L.power:null,mystery:L.mystery,guide:true,id:"lotcard"});
+  const rows=G.managers.map(m=>{const me=mine(m);
+    if(L.blind){const can=L.blindIds.includes(m.id),done=m.id in L.sealed;
+      return`<div class="bidder ${can?"":"out"} ${me&&role!=="local"?"me":""}">${badge(m)}<div class="nm"><b>${esc(m.name)}</b>${you(m)}<div class="small"><span class="coin" data-coin="${m.id}" data-v="${m.money}">$${m.money}</span> · ${m.squad.length}/${G.settings.squad}</div></div>
+      <div class="acts">${!can?'<span class="status muted">Can\'t bid</span>':done?'<span class="status acc">Locked in</span>':me?`<input type="password" inputmode="numeric" class="sealin" id="seal-${m.id}" placeholder="Secret $" autocomplete="off" data-keep><button class="acc-b" data-a="seal" data-mid="${m.id}">Lock</button><button class="ghost" data-a="sealskip" data-mid="${m.id}">Skip</button>`:'<span class="status muted">Thinking…</span>'}</div></div>`}
+    const can=eligible(G,m),isLead=m.id===L.leader,passed=L.passed.includes(m.id);
+    const st=isLead?'<span class="status acc">Top bid</span>':passed?'<span class="status muted">Passed</span>':!can?`<span class="status muted">${wild||m.squad.length<G.settings.squad?"Not enough money":"Squad full"}</span>`:null;
+    return`<div class="bidder ${isLead?"lead":""} ${!can&&!isLead?"out":""} ${me&&role!=="local"?"me":""}">${badge(m)}<div class="nm"><b>${esc(m.name)}</b>${you(m)}<div class="small"><span class="coin" data-coin="${m.id}" data-v="${m.money}">$${m.money}</span> · ${m.squad.length}${wild?"":"/"+G.settings.squad} ${esc(MODE.noun)}s${m.powers.length?" · "+m.powers.map(x=>POWERS[x].name).join(", "):""}</div></div>
+    <div class="acts">${st||(me?[1,5,10].map(i=>`<button data-a="bid" data-mid="${m.id}" data-inc="${i}" ${L.bid+i<=m.money||i===1?"":"disabled"}>+$${i}</button>`).join("")+`<button class="ghost" data-a="pass" data-mid="${m.id}">Pass</button>`:'<span class="status">Can bid</span>')}</div></div>`}).join("");
+  const rec=G.record&&Mby(G.record.mid);
+  return`<div class="table"><div class="cardwrap">${card}
+    ${rec?`<div class="panel" style="padding:12px"><span class="lbl">Biggest buy</span><div class="rec">${badge(rec,1)}<span><b>${esc(G.record.k==="w"?POWERS[G.record.power].name+" card":P[G.record.pid].name)}</b> · ${esc(rec.name)}</span><span class="coin" style="margin-left:auto">$${G.record.amt}</span></div></div>`:""}</div>
+  <div class="panel" id="stage"><div class="lotinfo"><div><span class="lbl">${wild?`Wildcard round · lot ${G.lotNo} of ${G.lotTotal}`:`Lot ${G.lotNo} · ${G.queue.length} left in the queue`}${L.blind?" · BLIND BID":""}</span>
+    <div class="amt">${L.blind?"???":"$"+L.bid}</div><div>${L.blind?"Each manager secretly locks in one bid. Highest wins.":lead?`<b>${esc(lead.name)}</b> leads`:"No bids yet. The clock starts on the first bid."}</div></div>
+    ${L.blind?(host?`<button class="ghost" data-a="sell">Reveal now</button>`:""):`<div class="clock" id="clock"><span class="lbl" id="clock-l">Clock</span><span class="sec" id="clock-s">${G.settings.timer}s</span><div class="barb"><b id="clock-b" style="width:100%"></b></div></div>`}</div>
+    <div class="bidders">${rows}</div>
+    ${L.blind?"":`<div class="row between"><span class="small muted">If nobody beats a bid in ${G.settings.timer} seconds, it's sold.</span>${host?`<button class="ghost sm" data-a="sell">${lead?"Sell now":"Skip"}</button>`:""}</div>`}</div></div>`}
+
+// ---------- trading ----------
+function tradeUI(){const mineList=myMs();
+  const side=x=>[...x.p.map(id=>pchip(id)),x.m?`<span class="coin">$${x.m}</span>`:""].filter(Boolean).join(" ")||'<span class="muted">nothing</span>';
+  const open=G.trades.filter(t=>t.status==="open");
+  const offers=`<div class="panel"><h2>Offers</h2>
+    ${open.length?open.map(t=>{const f=Mby(t.from),o=Mby(t.to);if(!f||!o)return"";const forMe=mine(o),fromMe=mine(f);
+      return`<div class="offer ${forMe&&role!=="local"?"forme":""}"><div class="row">${badge(f,1)}<b>${esc(f.name)}</b><span class="muted">→</span>${badge(o,1)}<b>${esc(o.name)}</b>${t.counterOf?'<span class="pw-tag">Counter</span>':""}</div>
+      <div class="sides small"><div><span class="lbl">${esc(f.name)} gives</span><div class="chips">${side(t.give)}</div></div><div><span class="lbl">${esc(o.name)} gives</span><div class="chips">${side(t.get)}</div></div></div>
+      <div class="row">${forMe?`<button class="acc-b sm" data-a="accept" data-tid="${t.id}">Accept (final)</button><button class="ghost sm" data-a="counter" data-tid="${t.id}">Counter</button><button class="ghost sm" data-a="decline" data-tid="${t.id}">Decline</button>`:""}
+      ${fromMe?`<button class="ghost sm" data-a="cancel" data-tid="${t.id}">Withdraw</button>`:""}${!forMe&&!fromMe?`<span class="small muted">Waiting for ${esc(o.name)}</span>`:""}</div></div>`}).join(""):'<span class="empty">No open offers.</span>'}
+    ${amHost()?`<button data-a="next">${G.phase==="trade1"?"Close trading → Wildcards":"Close the window → Results"}</button>`:'<span class="small muted">The host closes the trading window.</span>'}</div>`;
+  if(!mineList.length)return`<div class="trade"><div class="col">${watchingNote()}</div><div class="col">${offers}</div></div>`;
+  let d=ui.td;const others=f=>G.managers.filter(m=>m.id!==f);
+  if(!d||!mine(Mby(d.from))||!Mby(d.to)||d.from===d.to){const f=mineList[0].id;d=ui.td={from:f,to:others(f)[0]?.id,give:[],get:[],gm:0,tm:0,counterOf:null}}
+  const f=Mby(d.from),o=Mby(d.to);if(!o)return`<div class="trade"><div></div><div class="col">${offers}</div></div>`;
+  d.give=d.give.filter(id=>f.squad.includes(id));d.get=d.get.filter(id=>o.squad.includes(id));
+  const box=(m,arr,key)=>m.squad.length?m.squad.map(id=>{const p=P[id];return`<label><input type="checkbox" data-pick="${key}" value="${id}" ${arr.includes(id)?"checked":""}>${pchip(id)}<span class="small muted">${esc(p.pos)}</span></label>`}).join(""):'<span class="empty">Nobody</span>';
+  return`<div class="trade"><div class="panel"><div class="row between"><h2>${d.counterOf?"Counter-offer":"Make an offer"}</h2>${d.counterOf?'<button class="ghost sm" data-a="clearTd">Start fresh</button>':""}</div>
+    <div class="row">${mineList.length>1?`<label class="lbl" for="t-from">From</label><select id="t-from">${mineList.map(m=>`<option value="${m.id}" ${m.id===d.from?"selected":""}>${esc(m.name)}</option>`).join("")}</select>`:""}
+      <label class="lbl" for="t-to">Trade with</label><select id="t-to">${others(d.from).map(m=>`<option value="${m.id}" ${m.id===d.to?"selected":""}>${esc(m.name)}</option>`).join("")}</select></div>
+    <div class="sets" style="grid-template-columns:1fr 1fr"><div class="pick"><span class="lbl">${esc(f.name)} gives</span>${box(f,d.give,"give")}<div class="row"><label class="lbl" for="t-gm">+ money</label><input id="t-gm" type="number" min="0" max="${f.money}" value="${d.gm}" style="width:90px"></div></div>
+      <div class="pick"><span class="lbl">${esc(o.name)} gives</span>${box(o,d.get,"get")}<div class="row"><label class="lbl" for="t-tm">+ money</label><input id="t-tm" type="number" min="0" max="${o.money}" value="${d.tm}" style="width:90px"></div></div></div>
+    <button class="acc-b" data-a="propose">Send offer to ${esc(o.name)}</button></div>
+  <div class="col">${offers}${G.phase==="trade2"?powerUI():""}</div></div>`}
+function powerUI(){const holders=myMs().filter(m=>m.powers.some(p=>p!=="block"));
+  if(!holders.length)return`<div class="panel"><h2>Power cards</h2><span class="empty">${role==="local"?"Nobody has":"You don't have"} a playable power card.${G.managers.some(m=>m.powers.includes("block"))?" Block cards work automatically.":""}</span></div>`;
+  const w=ui.pw;if(!holders.some(m=>m.id===w.mid))w.mid=holders[0].id;const m=Mby(w.mid);const usable=[...new Set(m.powers.filter(p=>p!=="block"))];if(!usable.includes(w.power))w.power=usable[0];
+  const others=G.managers.filter(x=>x.id!==m.id);if(!others.some(x=>x.id===w.target))w.target=others[0]?.id;const t=Mby(w.target);
+  const pl=(mm,k)=>`<select data-pw="${k}" id="pw-${k}"><option value="">Pick…</option>${mm.squad.map(id=>`<option value="${id}" ${String(w[k])===String(id)?"selected":""}>${esc(P[id].name)} (${P[id].r})</option>`).join("")}</select>`;
+  return`<div class="panel"><h2>Power cards</h2><p class="small muted">Block cards work automatically when someone targets you.</p>
+  <div class="row">${holders.length>1?`<select data-pw="mid" id="pw-mid">${holders.map(x=>`<option value="${x.id}" ${x.id===m.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select>`:""}
+  <select data-pw="power" id="pw-power">${usable.map(p=>`<option value="${p}" ${p===w.power?"selected":""}>${POWERS[p].name}</option>`).join("")}</select></div>
+  <p class="small">${POWERS[w.power].desc}</p>
+  ${w.power==="double"?`<div class="row"><span class="lbl">Player</span>${pl(m,"pid")}</div>`:`<div class="row"><span class="lbl">Target</span><select data-pw="target" id="pw-target">${others.map(x=>`<option value="${x.id}" ${x.id===w.target?"selected":""}>${esc(x.name)}${x.powers.includes("block")?" (has Block)":""}</option>`).join("")}</select></div>
+    ${w.power==="steal"?`<div class="row"><span class="lbl">Steal</span>${pl(t,"pid")}</div>`:`<div class="row"><span class="lbl">Give</span>${pl(m,"pid")}<span class="lbl">Take</span>${pl(t,"pid2")}</div>`}`}
+  <button class="acc-b" data-a="usepower">Play ${POWERS[w.power].name}</button></div>`}
+
+// ---------- results ----------
+const judgeN=()=>{const c=G.managers.map(m=>m.squad.length).filter(n=>n>0);return c.length?Math.min(...c):0};
+function quick(){const N=judgeN();return G.managers.map(m=>{const top=[...m.squad].sort((x,y)=>P[y].r*(G.doubled[y]?2:1)-P[x].r*(G.doubled[x]?2:1)).slice(0,N);
+  const sc=top.length?Math.round(top.reduce((x,id)=>x+P[id].r*(G.doubled[id]?1.5:1),0)/N+new Set(top.map(id=>P[id].pos)).size*2+m.money/20):0;return{m,sc,top}}).sort((a,b)=>b.sc-a.sc)}
+const squadsText=()=>G.managers.map(m=>`${m.name} ($${m.money} left): `+(m.squad.map(id=>`${P[id].name} (${P[id].pos}, ${P[id].nat}, rating ${P[id].r}${G.doubled[id]?", DOUBLE: counts twice":""})`).join("; ")||`no ${MODE.noun}s`)).join("\n");
+function judgePrompt(){const N=judgeN();return`You are the judge and commentator of a draft game between friends called Transfer Window. Game mode: ${MODE.name}. Each manager bought ${MODE.noun}s in a live auction, traded, bought wildcards and played power cards.
+Rule: the smallest squad has ${N}, so every manager may only use their best ${N} ${MODE.noun}s. For each manager choose their strongest ${N} (best combination, not just highest ratings). A player marked DOUBLE counts twice as much.
+${MODE.judge} Leftover money is only a tiny tiebreaker. A manager with nobody finishes last. Be fair, fun and exciting, suitable for kids.
+
+Final squads:
+${squadsText()}
+
+Reply with JSON only (no other text), in exactly this shape:
+{"winner":"<manager name exactly as written>","summary":"2 sentences on why they won","commentary":"an exciting 130-180 word play-by-play of the decisive showdown, written like a live commentator, naming real ${MODE.noun}s from the lineups","mvp":{"name":"<one ${MODE.noun} from any lineup>","manager":"<their manager>","why":"one sentence"},"ranking":[{"name":"<manager>","lineup":["<exactly ${N} names>"],"score":<0-100>,"why":"one short sentence"}]}
+Include every manager in ranking, best first.`}
+function cleanVerdict(v){if(!v||!Array.isArray(v.ranking)||!v.ranking.length)throw"Claude's answer is missing the ranking. Ask it to reply with the JSON again.";const N=judgeN();
+  return{n:N,winner:String(v.winner||v.ranking[0]?.name||"").slice(0,40),summary:String(v.summary||"").slice(0,600),commentary:String(v.commentary||"").slice(0,3000),
+    mvp:v.mvp&&v.mvp.name?{name:String(v.mvp.name).slice(0,60),manager:String(v.mvp.manager||"").slice(0,40),why:String(v.mvp.why||"").slice(0,300)}:null,
+    ranking:v.ranking.slice(0,MAXMGR).map(r=>({name:String(r.name).slice(0,40),lineup:(Array.isArray(r.lineup)?r.lineup:[]).slice(0,N).map(x=>String(x).slice(0,60)),score:Math.max(0,Math.min(100,Math.round(+r.score||0))),why:String(r.why||"").slice(0,300)}))}}
+function parseVerdict(text){const a=text.indexOf("{"),b=text.lastIndexOf("}");if(a<0||b<=a)throw"I couldn't find Claude's answer in that. Paste Claude's whole reply.";
+  let v;try{v=JSON.parse(text.slice(a,b+1))}catch(e){throw"That answer isn't in the right format. Ask Claude to reply with the JSON only, then paste it again."}return cleanVerdict(v)}
+function quickVerdict(){const q=quick(),N=judgeN(),w=q[0];let best=null;q.forEach(x=>x.top.forEach(id=>{if(!best||P[id].r>P[best.id].r)best={id,m:x.m}}));
+  return cleanVerdict({winner:w.m.name,summary:`${w.m.name} wins on the quick score: the best average rating across their top ${N}, plus a bonus for variety.`,commentary:"",
+    mvp:best?{name:P[best.id].name,manager:best.m.name,why:`The highest-rated ${MODE.noun} in any final lineup.`}:null,
+    ranking:q.map(x=>({name:x.m.name,lineup:x.top.map(id=>P[id].name),score:Math.min(100,x.sc),why:x.top.length?`Average rating ${Math.round(x.top.reduce((s,id)=>s+P[id].r,0)/x.top.length)}.`:`No ${MODE.noun}s.`}))})}
+function startTyping(){clearInterval(startTyping.h);startTyping.h=setInterval(()=>{const txt=G?.verdict?.commentary||"";ui.typePos+=3;const el=document.getElementById("comm");
+  if(el)el.innerHTML=esc(txt.slice(0,ui.typePos))+(ui.typePos<txt.length?'<span class="cur"></span>':"");if(ui.typePos>=txt.length)clearInterval(startTyping.h)},30)}
+function results(){const v=G.verdict,N=judgeN(),host=amHost();
+  if(!v||ui.reveal==="drum"){const q=quick();return`<div class="panel" style="align-items:center;text-align:center;padding:34px 18px"><h2 style="font-size:3rem">Who wins?</h2>
+    <p class="muted" style="max-width:60ch">The smallest squad has <b>${N}</b>, so everyone is judged on their best ${N}. Claude picks each lineup, names the winner and the MVP, and commentates the decider.</p>
+    ${host?`<div class="judge" style="width:100%">
+      <div class="st"><span class="num acc" style="font-family:var(--display);font-size:2rem;font-weight:900">1</span><b>Copy the judging prompt</b><p class="small muted">It has every squad and the rules.</p><button class="acc-b" data-a="copyprompt">Copy prompt</button></div>
+      <div class="st"><span class="num acc" style="font-family:var(--display);font-size:2rem;font-weight:900">2</span><b>Paste it into Claude</b><p class="small muted">Open <a href="https://claude.ai/new" target="_blank" rel="noopener" style="color:var(--accent)">claude.ai</a> in a new tab, paste, and send.</p></div>
+      <div class="st"><span class="num acc" style="font-family:var(--display);font-size:2rem;font-weight:900">3</span><b>Paste Claude's answer here</b><textarea id="verdict-in" placeholder="Paste Claude's whole reply" data-keep></textarea><button class="acc-b" data-a="reveal">Reveal the winner</button></div></div>
+      <button class="ghost sm" data-a="quickwin">No Claude? Use the quick score instead</button>`
+      :`<p class="drum" style="font-size:2rem;animation:none">Waiting for the host to get Claude's verdict…</p>`}</div>
+    <div class="panel"><span class="lbl">Quick score (best ${N} by rating + variety)</span>${q.map((x,i)=>`<div class="rank"><b>${i+1}</b>${badge(x.m,1)}<div><b>${esc(x.m.name)}</b>${you(x.m)}<div class="chips">${x.top.map(pchip).join("")}</div></div><span class="sc">${x.sc}</span></div>`).join("")}</div>${sheets()}`}
+  const byName=n=>G.managers.find(m=>m.name.toLowerCase()===String(n).toLowerCase())||{name:n,color:"#888",icon:"?"};
+  const top=v.ranking.slice(0,3),order=[top[1],top[0],top[2]],hts=[150,210,110],places=[2,1,3];
+  const mvpP=v.mvp&&P.find(p=>p.name.toLowerCase()===v.mvp.name.toLowerCase());
+  const txt=v.commentary,typed=ui.typeFor===G.id&&ui.typePos<txt.length;
+  return`<div class="panel" style="gap:20px"><div style="text-align:center"><span class="crown">Champion</span><h2 style="font-size:3.4rem">${esc(v.winner)} wins!</h2><p class="muted" style="max-width:60ch;margin:6px auto 0">${esc(v.summary)}</p></div>
+    <div class="podium">${order.map((r,i)=>r?`<div class="step"><span class="badge" style="--c:${esc(byName(r.name).color)}">${esc(byName(r.name).icon)}</span><span class="who">${esc(r.name)}</span><span class="coin">${r.score}</span><div class="blk" style="--c:${esc(byName(r.name).color)};height:${hts[i]}px;animation-delay:${[.3,.6,0][i]}s">${places[i]}</div></div>`:"<div></div>").join("")}</div></div>
+  <div class="resgrid">${txt?`<div class="panel"><span class="lbl">Live commentary</span><p class="comm" id="comm">${esc(typed?txt.slice(0,ui.typePos):txt)}${typed?'<span class="cur"></span>':""}</p></div>`:'<div></div>'}
+    <div class="panel mvp"><span class="crown">MVP</span>${v.mvp?(mvpP?cardHTML(mvpP,{cls:"legend",label:"MVP"}):`<div class="card legend"><span class="tier">MVP</span><span class="nm">${esc(v.mvp.name)}</span></div>`)+`<p class="small"><b>${esc(v.mvp.manager)}</b>: ${esc(v.mvp.why)}</p>`:'<span class="empty">No MVP named.</span>'}</div></div>
+  <div class="panel"><span class="lbl">Final table · best ${v.n} each</span>${v.ranking.map((r,i)=>`<div class="rank"><b>${i+1}</b>${badge(byName(r.name),1)}<div><b>${esc(r.name)}</b><div class="small muted">${esc(r.why)}</div>${r.lineup.length?`<div class="chips" style="margin-top:4px">${r.lineup.map(n=>{const p=P.find(x=>x.name.toLowerCase()===n.toLowerCase());return p?pchip(p.id):`<span class="pc">${esc(n)}</span>`}).join("")}</div>`:""}</div><span class="sc">${r.score}</span></div>`).join("")}</div>
+  <div class="row" style="justify-content:center">${host?`<button class="acc-b big" data-a="rematch">Play again (same managers)</button>`:'<span class="muted">The host can start another round with the same managers.</span>'}<button class="ghost big" data-a="home">Home</button></div>${sheets()}`}
+
+// ================= render =================
+function render(){const app=document.getElementById("app"),ae=document.activeElement,fid=ae&&ae.id,sel=fid&&ae.selectionStart!=null?[ae.selectionStart,ae.selectionEnd]:null;
+  const keep={};document.querySelectorAll("[data-keep]").forEach(el=>{if(el.id)keep[el.id]=el.value});
+  if(ui.screen!=="home"&&!G)ui.screen="home";
+  if(G)useGame(G);
+  document.body.dataset.theme=ui.screen==="home"?(ui.roster&&ui.previewMode?ui.previewMode:"mega"):G.mode;
+  if(ui.screen==="home"){app.innerHTML=home()}
+  else{let body="";
+    if(G.phase==="setup")body=setup();
+    else if(G.phase==="auction"||G.phase==="wild")body=watchingNote()+auction()+sheets()+feed();
+    else if(G.phase==="trade1"||G.phase==="trade2")body=`<div class="panel"><h2>${G.phase==="trade1"?"Trading window":"Final trading round"}</h2><p class="muted">${G.phase==="trade1"?"Trade players, money or both before the wildcards. Accepted deals are final.":"Last chance to trade, and the time to play power cards. Accepted deals are final."}</p></div>`+tradeUI()+sheets()+feed();
+    else body=results();
+    app.innerHTML=topbar()+body+footer()}
+  document.getElementById("layer").innerHTML=(ui.roster?roster():"")+(ui.reveal==="drum"?`<div class="ov solid"><div class="drum">And the winner is…</div></div>`:"");
+  for(const id in keep){const el=document.getElementById(id);if(el&&keep[id]!==""&&el.value!==keep[id])el.value=keep[id]}
+  if(fid){const el=document.getElementById(fid);if(el){el.focus();if(sel)try{el.setSelectionRange(...sel)}catch(e){}}}
+  afterRender()}
+function afterRender(){if(!G||ui.screen==="home")return;
+  const key=G.lot?`${G.id}:${G.round}:${G.lotNo}`:null;if(key&&key!==lastLotKey){const c=document.getElementById("lotcard");if(c){c.classList.add("flip");if(lastLotKey!==null)SFX.flip()}}lastLotKey=key;
+  const bk=G.lot&&!G.lot.blind&&G.lot.leader?`${key}:${G.lot.bid}`:null;if(bk&&lastBidKey!==undefined&&bk!==lastBidKey)SFX.bid();lastBidKey=bk;
+  document.querySelectorAll("[data-coin]").forEach(el=>{const id=el.dataset.coin,v=+el.dataset.v,pv=ui.coinPrev[id];
+    if(pv!==undefined&&pv!==v){const t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/700);el.textContent="$"+Math.round(pv+(v-pv)*k);if(k<1)requestAnimationFrame(step)};el.textContent="$"+pv;requestAnimationFrame(step)}});
+  G.managers.forEach(m=>ui.coinPrev[m.id]=m.money);
+  const S=G.lastSale;if(S&&S.n!==shownSale){shownSale=S.n;showSold(S)}
+  const PW=G.lastPower;if(PW&&PW.n!==shownPower){shownPower=PW.n;SFX.power();toast(PW.txt)}
+  if(G.verdict&&seenVerdict!==G.id){seenVerdict=G.id;revealVerdict()}
+  updateClock()}
+function revealVerdict(){const gid=G.id;ui.reveal="drum";SFX.drum(2.4);render();
+  setTimeout(()=>{if(!G||G.id!==gid)return;ui.reveal=null;ui.typeFor=gid;ui.typePos=0;render();SFX.fanfare();
+    const v=G.verdict,w=G.managers.find(m=>m.name.toLowerCase()===v.winner.toLowerCase());confetti([w?.color||"#ffd166","#ffffff",getComputedStyle(document.body).getPropertyValue("--accent")],220);startTyping();
+    const counted=LS.get("tw-counted")||[];if(!counted.includes(gid)){const wins=LS.get("tw-wins")||{};wins[v.winner]=(wins[v.winner]||0)+1;LS.set("tw-wins",wins);LS.set("tw-counted",[gid,...counted].slice(0,50))}},2400)}
+function showSold(S){const m=Mby(S.mid);if(!m)return;const layer=document.createElement("div");layer.className="ov";layer.style.cursor="pointer";
+  layer.innerHTML=`<div class="soldbox">${cardHTML(S.k==="p"?P[S.pid]:null,{power:S.k==="w"?S.power:null,cls:"flip"})}<div class="stamp">SOLD</div><div class="soldto">${S.mystery?"Mystery revealed! ":""}${esc(m.icon)} ${esc(m.name)} · $${S.amt}</div></div>`;
+  document.body.appendChild(layer);SFX.sold();confetti([m.color,"#ffffff","#ffd166"],120);const close=()=>layer.remove();layer.onclick=close;setTimeout(close,1900)}
+let lastSec=null;
+function updateClock(){const box=document.getElementById("clock");if(!box||!G?.lot||G.lot.blind)return;const L=G.lot,T=G.settings.timer;
+  const l=document.getElementById("clock-l"),s=document.getElementById("clock-s"),b=document.getElementById("clock-b");
+  if(!L.leader){l.textContent="Clock";s.textContent=T+"s";b.style.width="100%";box.classList.remove("hot");lastSec=null;return}
+  const rem=Math.max(0,L.endsAt-serverNow()),sec=Math.ceil(rem/1000);l.textContent=sec<=1?"Going, going…":"Going once…";s.textContent=sec+"s";b.style.width=Math.min(100,rem/(T*10))+"%";box.classList.toggle("hot",sec<=3);
+  if(sec<=3&&sec>0&&sec!==lastSec){SFX.tick();const st=document.getElementById("stage");if(st){st.classList.remove("shake","flash");void st.offsetWidth;st.classList.add("shake","flash")}}lastSec=sec}
+setInterval(()=>{if(ui.screen==="game"&&role!=="guest"&&G?.lot&&!G.lot.blind&&G.lot.leader&&serverNow()>=G.lot.endsAt)act({type:"timeout"});else updateClock()},100);
+
+// ================= events =================
+async function copyText(t,okMsg){try{await navigator.clipboard.writeText(t);toast(okMsg)}catch(e){toast("Couldn't copy automatically. Select the text and press Ctrl+C.")}}
+document.addEventListener("submit",e=>{e.preventDefault();
+  if(e.target.id==="f-add"){const i=document.getElementById("m-name"),name=i.value;const before=G.managers.length;i.value="";
+    const firstMine=!myMs().length;act({type:"addM",name,color:ui.newM.color,icon:ui.newM.icon});if(G.managers.length>before){if(firstMine)saveProfile(name.trim());const used=G.managers.map(m=>m.color);ui.newM.color=COLORS.find(c=>!used.includes(c))||COLORS[0];ui.newM.icon=ICONS[(ICONS.indexOf(ui.newM.icon)+1)%ICONS.length];render();document.getElementById("m-name")?.focus()}else i.value=name}
+  if(e.target.id==="f-join"){const code=document.getElementById("j-code").value,name=document.getElementById("j-name").value.trim();
+    if(!name)return toast("Type your manager name.");saveProfile(name);joinOnline(code,{name,color:ui.newM.color,icon:ui.newM.icon})}});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;if(b.dataset.a==="closeR"&&e.target.closest("[data-stop]")&&!e.target.closest("button"))return;
+  const d=b.dataset,a=d.a;if(a!=="home")ui.leaveArm=false;
+  switch(a){
+  case"hostgame":hostOnline();break;
+  case"local":startLocal(false);break;
+  case"resumeLocal":startLocal(true);break;
+  case"rejoin":{const s=LS.get("tw-session");if(s)joinOnline(s.code,null);break}
+  case"preview":ui.previewMode=d.mode;ui.rq="";ui.rrole="";ui.roster=true;render();break;
+  case"home":{const risky=G&&role!=="guest"&&!["setup","results"].includes(G.phase);if(risky&&!ui.leaveArm){ui.leaveArm=true;render();break}goHome();break}
+  case"mute":SFX.muted=!SFX.muted;LS.set("tw-mute",SFX.muted);render();break;
+  case"roster":ui.rq="";ui.rrole="";ui.roster=true;render();setTimeout(()=>document.getElementById("rq")?.focus(),0);break;
+  case"closeR":ui.roster=false;render();break;
+  case"rrole":ui.rrole=d.v;render();break;
+  case"ncolor":ui.newM.color=d.v;render();break;
+  case"nicon":ui.newM.icon=d.v;render();break;
+  case"copylink":copyText(`${location.origin}${location.pathname}?join=${CODE}`,"Invite link copied. Send it to your friends.");break;
+  case"cyc":{const m=Mby(d.mid);dispatch({type:"editM",mid:d.mid,data:{icon:ICONS[(ICONS.indexOf(m.icon)+1)%ICONS.length],color:COLORS[(COLORS.indexOf(m.color)+1)%COLORS.length]}});break}
+  case"removeM":dispatch({type:"removeM",mid:d.mid});break;
+  case"start":dispatch({type:"start"});scrollTo(0,0);break;
+  case"bid":dispatch({type:"bid",mid:d.mid,inc:+d.inc});break;
+  case"pass":dispatch({type:"pass",mid:d.mid});break;
+  case"sell":dispatch({type:"sell"});break;
+  case"seal":{const i=document.getElementById("seal-"+d.mid),v=i?i.value.trim():"";if(!/^\d+$/.test(v)){toast("Type a whole-dollar amount, or press Skip.");break}i.value="";SFX.bid();dispatch({type:"seal",mid:d.mid,amount:+v});break}
+  case"sealskip":dispatch({type:"seal",mid:d.mid,amount:0});break;
+  case"propose":{const t=ui.td;if(!t)break;dispatch({type:"propose",t:{from:t.from,to:t.to,give:{p:t.give,m:+t.gm||0},get:{p:t.get,m:+t.tm||0},counterOf:t.counterOf}});
+    ui.td={from:t.from,to:t.to,give:[],get:[],gm:0,tm:0,counterOf:null};render();break}
+  case"accept":dispatch({type:"respond",tid:d.tid,accept:true});break;
+  case"decline":dispatch({type:"respond",tid:d.tid,accept:false});break;
+  case"cancel":dispatch({type:"cancel",tid:d.tid});break;
+  case"counter":{const t=G.trades.find(x=>x.id===d.tid);if(!t)break;ui.td={from:t.to,to:t.from,give:[...t.get.p],get:[...t.give.p],gm:t.get.m,tm:t.give.m,counterOf:t.id};render();scrollTo({top:0,behavior:"smooth"});toast("Change the deal, then send it back.");break}
+  case"clearTd":ui.td=null;render();break;
+  case"usepower":{const w=ui.pw;dispatch({type:"power",mid:w.mid,power:w.power,target:w.target,pid:w.pid===""||w.pid==null?null:+w.pid,pid2:w.pid2===""||w.pid2==null?null:+w.pid2});ui.pw={mid:w.mid};render();break}
+  case"next":dispatch({type:"next"});scrollTo(0,0);break;
+  case"copyprompt":copyText(judgePrompt(),"Prompt copied. Paste it into Claude.");break;
+  case"reveal":{const t=document.getElementById("verdict-in")?.value||"";try{const v=parseVerdict(t);dispatch({type:"verdict",verdict:v})}catch(err){toast(typeof err==="string"?err:"That didn't work.")}break}
+  case"quickwin":dispatch({type:"verdict",verdict:quickVerdict()});break;
+  case"rematch":if(!amHost())break;G=newGame(G);syncSeen();ui.td=null;ui.pw={};commit();scrollTo(0,0);break;
+  }});
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.id==="mode-sel")dispatch({type:"mode",mode:t.value});
+  else if(t.dataset.set){const k=t.dataset.set,v=k==="powers"?t.value==="true":+t.value;dispatch({type:"setting",key:k,val:v})}
+  else if(t.id==="t-from"){ui.td={...ui.td,from:t.value,give:[],gm:0,counterOf:null};render()}
+  else if(t.id==="t-to"){ui.td={...ui.td,to:t.value,get:[],tm:0,counterOf:null};render()}
+  else if(t.dataset.pick){const arr=ui.td[t.dataset.pick],id=+t.value;if(t.checked){if(!arr.includes(id))arr.push(id)}else arr.splice(arr.indexOf(id),1)}
+  else if(t.dataset.pw){ui.pw[t.dataset.pw]=t.value;if(t.dataset.pw!=="pid"&&t.dataset.pw!=="pid2"){if(t.dataset.pw!=="target")ui.pw.target=undefined;ui.pw.pid=undefined;ui.pw.pid2=undefined}render()}
+  else if(["c-title","c-text","c-judge"].includes(t.id)){dispatch({type:"custom",data:{[{"c-title":"title","c-text":"text","c-judge":"judge"}[t.id]]:t.value}})}});
+document.addEventListener("input",e=>{const t=e.target;
+  if(t.id==="t-gm"&&ui.td)ui.td.gm=Math.max(0,parseInt(t.value)||0);if(t.id==="t-tm"&&ui.td)ui.td.tm=Math.max(0,parseInt(t.value)||0);
+  if(t.id==="j-code"){const c=t.value.toUpperCase().replace(/[^A-Z]/g,"");if(c!==t.value)t.value=c}
+  if(t.id==="rq"){ui.rq=t.value;render()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&ui.roster){ui.roster=false;render()}
+  if(e.key==="Enter"&&e.target.classList?.contains("sealin")){e.preventDefault();e.target.closest(".acts")?.querySelector('[data-a="seal"]')?.click()}});
+render();
+if(JOIN)setTimeout(()=>{document.getElementById("joinbox")?.scrollIntoView({behavior:"smooth"});document.getElementById("j-name")?.focus()},300);
+</script>
+</body>
+</html>

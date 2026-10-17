@@ -4,7 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Transfer Window</title>
-<meta name="description" content="A multiplayer auction draft game. Made by Harry Sujivan.">
+<meta name="description" content="A multiplayer auction draft party game. Bid against the clock, trade, play power cards, and let Claude crown the champion. By The King Harry.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='14' fill='%23ff9f1c'/%3E%3Cpath d='M13 19h20M23 19v26' stroke='%23140f22' stroke-width='6' stroke-linecap='round' fill='none'/%3E%3Cpath d='M30 26l4 18 5-12 5 12 4-18' stroke='%23140f22' stroke-width='5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#140f22">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Transfer Window">
+<meta property="og:title" content="Transfer Window">
+<meta property="og:description" content="Bid against the clock, trade like a shark, play power cards, then let Claude crown the champion. By The King Harry.">
+<meta property="og:image" content="https://thekingharry.github.io/transfer-window/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://thekingharry.github.io/transfer-window/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@500;700&display=swap">
 <style>
@@ -213,6 +224,46 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 .judge .st{background:var(--panel2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
 .judge textarea{min-height:110px;font-size:.85rem}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--chalk);color:var(--ink);padding:10px 16px;border-radius:9px;font-weight:600;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.35);z-index:50}
+.logo{width:36px;height:36px;flex:none;display:block}
+.stats{display:flex;gap:6px 18px;flex-wrap:wrap;align-items:center;font-family:var(--label);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:.84rem;color:var(--dim)}
+.stats b{color:var(--chalk);font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4ade80;margin-right:6px;box-shadow:0 0 8px #4ade80;vertical-align:1px}
+.mbox{width:min(640px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 80px);overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.tut{align-items:center;text-align:center}
+.tut-art{font-size:4rem;line-height:1}
+.tut p{max-width:46ch}
+.tut-dots{display:flex;gap:6px}.tut-dots i{width:9px;height:9px;border-radius:50%;background:var(--line)}.tut-dots i.on{background:var(--accent)}
+.tips{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.tips li{background:var(--panel2);border-radius:10px;padding:10px 12px}
+.tips b{display:block;font-family:var(--display);font-size:1.15rem;text-transform:uppercase}
+.vote{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.sg{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:10px;background:var(--panel2)}
+.chatdock{position:fixed;right:20px;bottom:20px;z-index:25;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.chatbox{width:330px;max-width:calc(100vw - 40px);height:420px;background:var(--panel);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+.chathead{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
+.chathead b{font-family:var(--display);font-size:1.2rem;text-transform:uppercase}
+.msgs{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:.92rem;overflow-wrap:anywhere}
+.msg b{color:var(--c,var(--accent))}
+.msg.sys{color:var(--dim);font-style:italic}
+.chatin{display:flex;gap:6px;padding:10px;border-top:1px solid var(--line)}
+.chatin input{flex:1}
+.reacts{display:flex;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.reacts button{background:transparent;font-size:1.3rem;padding:4px 7px;border-radius:999px;color:inherit}
+.reacts button:hover{background:var(--panel2)}
+.unread{background:var(--accent2);color:var(--ink);border-radius:999px;padding:0 7px;margin-left:6px;font-size:.8rem}
+.floater{position:fixed;bottom:90px;z-index:45;pointer-events:none;display:flex;flex-direction:column;align-items:center;animation:floatUp 2.6s ease-out forwards}
+.floater span{font-size:2.8rem;line-height:1}
+.floater small{font-family:var(--label);font-weight:700;font-size:.78rem;background:rgba(0,0,0,.65);color:#fff;border-radius:4px;padding:1px 6px;margin-top:3px}
+@keyframes floatUp{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1;transform:translateY(-40px) scale(1.15)}100%{transform:translateY(-380px) scale(1);opacity:0}}
+.tag-bot{font-family:var(--label);font-weight:700;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);color:var(--dim);border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+input[type=range]{accent-color:var(--accent);padding:0;flex:1;min-width:120px}
+.toggle{display:flex;gap:6px;flex-wrap:wrap}
+.lbgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:860px){.lbgrid{grid-template-columns:1fr}}
+.iconbtn{width:38px;padding:6px 0;text-align:center}
+@media (min-width:900px){body.chatopen{padding-right:370px}}
+body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+body.calm .floater{animation:none!important;opacity:1}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
 </style>
 </head>
@@ -220,6 +271,7 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
 <div class="wrap" id="app"></div>
 <div id="layer"></div>
 <canvas id="fx"></canvas>
+<div class="chatdock" id="chat"></div>
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -870,9 +922,18 @@ const HOMEDECK=shuffle(MEGA.filter(p=>p.r>=84)).slice(0,6);
 const NAMES={...Object.fromEntries(Object.entries(MODES).map(([k,m])=>[k,m.name])),mega:"Mega mode",custom:"Custom"};
 const POWERS={steal:{name:"Steal",sym:"ST",desc:"Take one player from any manager."},block:{name:"Block",sym:"BL",desc:"Automatically stops a Steal or Swap aimed at you."},double:{name:"Double",sym:"×2",desc:"One of your players counts double when Claude judges."},swap:{name:"Swap",sym:"⇄",desc:"Swap one of your players for anyone else's. No saying no."}};
 const COLORS=["#ffd166","#ff6b6b","#4dabf7","#69db7c","#da77f2","#ff922b","#38d9a9","#f783ac","#a9e34b","#e9ecef"];
-const ICONS=["⚡","🔥","🦁","🐉","👑","🚀","💀","🦈","⭐","🌪️","🐺","🎯","🛡️","🍀","🤖","👾"];
+const ICONS=["⚡","🔥","🦁","🐉","👑","🚀","💀","🦈","⭐","🌪️","🐺","🎯","🛡️","🍀","🦅","👾"];
 const PHASES=[["setup","Setup"],["auction","Auction"],["trade1","Trading"],["wild","Wildcards"],["trade2","Final trades"],["results","Results"]];
-const DEFAULTS={budget:100,squad:4,wild:3,timer:10,blind:0,mystery:0,powers:true};
+const DEFAULTS={budget:100,squad:4,wild:0,timer:10,blind:0,mystery:0,powers:false};
+const BOT_NAMES=["Botzilla","Chip","Turbo","Glitch","Rusty","Nova","Sparky","Bolt","Pixel","Gizmo","Zap","Clank"];
+const REACTS=["😂","🔥","😱","👏","💀","🤑","😤","🐐"];
+const LOGO=`<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="var(--accent)"/><path d="M13 19h20M23 19v26" stroke="#140f22" stroke-width="6" stroke-linecap="round" fill="none"/><path d="M30 26l4 18 5-12 5 12 4-18" stroke="#140f22" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+// rude-word filter for names and chat
+const BAD_IN=["fuck","shit","bitch","cunt","asshole","bastard","slut","whore","nigger","nigga","faggot","retard","wank","twat","prick","bollock","porn","penis","vagina","nazi","hitler","motherf","dildo","boob","cum"];
+const BAD_WORD=["ass","fag","cock","dick","sex","rape","kys","tit","tits","hoe","hoes","piss","crap","damn","jizz","nude","nudes"];
+const normRude=w=>w.toLowerCase().replace(/[0@]/g,"o").replace(/[1!|]/g,"i").replace(/3/g,"e").replace(/4/g,"a").replace(/[5$]/g,"s").replace(/7/g,"t").replace(/[^a-z]/g,"");
+const isRude=t=>{const all=normRude(String(t||""));if(BAD_IN.some(w=>all.includes(w)))return true;return String(t||"").split(/[\s_.\-]+/).some(w=>BAD_WORD.includes(normRude(w)))};
+const cleanText=t=>String(t||"").split(/(\s+)/).map(w=>/\s/.test(w)||!isRude(w)?w:"*".repeat(Math.min(Math.max(w.length,3),8))).join("");
 const MAXMGR=12;
 
 let MODE,P;
@@ -898,7 +959,7 @@ const CFG_OK=!!(CFG&&CFG.apiKey&&CFG.databaseURL&&!/PASTE/i.test(CFG.apiKey+CFG.
 let fdb=null,uid=null,srvOff=0,netErr=null;
 let role=null,ME="local",CODE=null,offs=[];
 if(CFG_OK&&window.firebase){try{firebase.initializeApp(CFG);fdb=firebase.database();
-  firebase.auth().onAuthStateChanged(u=>{if(u){uid=u.uid;if(ui.screen==="home")render()}});
+  firebase.auth().onAuthStateChanged(u=>{if(u){const first=!uid;uid=u.uid;if(first)startNet();if(ui.screen==="home")render()}});
   firebase.auth().signInAnonymously().catch(e=>{netErr="Couldn't sign in to Firebase ("+(e.code||e.message)+"). Is Anonymous sign-in turned on?";render()});
   fdb.ref(".info/serverTimeOffset").on("value",s=>{srvOff=+s.val()||0})}catch(e){netErr="Firebase settings problem: "+(e.message||e);fdb=null}}
 else if(CFG_OK&&!window.firebase)netErr="Couldn't load Firebase. Check your internet connection.";
@@ -909,9 +970,9 @@ const TS=()=>firebase.database.ServerValue.TIMESTAMP;
 // ================= rules (only the host's laptop runs these) =================
 function newGame(prev,host){return{id:Date.now(),host:host??prev?.host,code:prev?.code||null,mode:prev?.mode||"soccer",settings:{...(prev?.settings||DEFAULTS)},
   custom:prev?.custom?{title:prev.custom.title,judge:prev.custom.judge,text:prev.custom.text}:{title:"",judge:"",text:""},
-  managers:(prev?.managers||[]).map(m=>({id:m.id,owner:m.owner,name:m.name,color:m.color,icon:m.icon,money:0,squad:[],powers:[]})),
+  managers:(prev?.managers||[]).map(m=>({id:m.id,owner:m.owner,bot:!!m.bot,persona:m.persona||1,name:m.name,color:m.color,icon:m.icon,money:0,squad:[],powers:[]})),
   phase:"setup",queue:[],requeued:[],used:[],lot:null,lotNo:0,lotTotal:0,round:"main",trades:[],doubled:{},log:[prev?"Rematch! Same managers, fresh draft.":"New game. Add your managers."],
-  record:null,lastSale:null,lastPower:null,verdict:null,notice:null,seq:prev?.seq||0}}
+  record:null,lastSale:null,lastPower:null,verdict:null,notice:null,ready:null,suggestions:[],seq:prev?.seq||0}}
 const log=(s,t)=>{s.log.unshift(t);s.log.length=Math.min(s.log.length,60)};
 const canBuy=(s,m,amt)=>m.money>=amt&&(s.round!=="main"||m.squad.length<s.settings.squad);
 function eligible(s,m){const L=s.lot;return!!L&&!L.blind&&m.id!==L.leader&&!L.passed.includes(m.id)&&canBuy(s,m,L.bid+1)}
@@ -941,15 +1002,23 @@ function checkTrade(s,t){const f=s.managers.find(m=>m.id===t.from),o=s.managers.
   if(!t.give.p.length&&!t.give.m&&!t.get.p.length&&!t.get.m)throw"Add something to the deal first.";
   if(t.give.p.some(id=>!f.squad.includes(id))||t.get.p.some(id=>!o.squad.includes(id)))throw"Some of those players have moved, so this deal no longer works.";
   if(t.give.m>f.money)throw`${f.name} only has $${f.money}.`;if(t.get.m>o.money)throw`${o.name} only has $${o.money}.`;return[f,o]}
-function cleanName(s,name,selfId){name=String(name||"").trim().slice(0,18);if(!name)throw"Type a manager name.";
+function cleanName(s,name,selfId){name=String(name||"").trim().slice(0,18);if(!name)throw"Type a manager name.";if(isRude(name))throw"Please pick a different name.";
   if(s.managers.some(m=>m.id!==selfId&&m.name.toLowerCase()===name.toLowerCase()))throw`The name "${name}" is taken. Pick another.`;return name}
+const humanOwners=s=>[...new Set(s.managers.filter(m=>!m.bot).map(m=>m.owner))];
+function doStart(s){if(s.mode==="custom"){s.custom.list=parseCustom(s.custom.text);useGame(s)}
+    const n=s.managers.length,need=n*s.settings.squad;if(n<2)throw"Add at least 2 managers.";
+    if(P.length<need)throw`${MODE.name} needs at least ${need} entries for ${n} managers (it has ${P.length}).`;
+    s.managers.forEach(m=>{m.money=s.settings.budget;m.squad=[];m.powers=[]});
+    const pool=shuffle(P.map(p=>p.id)).slice(0,need);s.used=[...pool];s.queue=pool.map(pid=>({k:"p",pid}));s.requeued=[];s.round="main";s.phase="auction";s.lotNo=0;s.lotTotal=pool.length;s.doubled={};s.trades=[];s.record=null;s.verdict=null;
+    log(s,`${MODE.name}: ${pool.length} ${MODE.noun}s up for auction. $${s.settings.budget} each, ${s.settings.squad} per squad.`);s.suggestions=[];s.ready=null;nextLot(s)}
 function reduce(S,a){const s=structuredClone(S);s.seq++;useGame(s);const now=serverNow(),M=id=>s.managers.find(m=>m.id===id),by=a.by,host=by===s.host;
   const hostOnly=()=>{if(!host)throw"Only the host can do that."};
   const inSetup=()=>{if(s.phase!=="setup")throw"That can only be done during setup."};
   const own=m=>{if(!m)throw"That manager isn't in the game.";if(m.owner!==by)throw"You can only play for your own manager.";return m};
+  if(["mode","setting","custom","addM","join","removeM","addBot"].includes(a.type)&&s.ready){s.ready=null;log(s,"Setup changed, so the ready check was cancelled.")}
   switch(a.type){
   case"mode":hostOnly();inSetup();if(!NAMES[a.mode])throw"Unknown mode.";s.mode=a.mode;useGame(s);log(s,`Mode: ${MODE.name}.`);break;
-  case"setting":hostOnly();inSetup();if(!(a.key in DEFAULTS))break;s.settings[a.key]=a.val;break;
+  case"setting":{hostOnly();inSetup();const o=SETS.find(x=>x[0]===a.key);if(!o||!o[2].some(x=>String(x[0])===String(a.val)))break;s.settings[a.key]=a.val;break}
   case"custom":hostOnly();inSetup();for(const k of["title","text","judge"])if(k in a.data)s.custom[k]=String(a.data[k]).slice(0,k==="text"?8000:200);break;
   case"addM":{hostOnly();inSetup();if(s.managers.length>=MAXMGR)throw`${MAXMGR} managers is the most.`;const name=cleanName(s,a.name);
     s.managers.push({id:"m"+s.seq,owner:by,name,color:a.color,icon:a.icon,money:0,squad:[],powers:[]});log(s,`${name} joined.`);break}
@@ -959,12 +1028,28 @@ function reduce(S,a){const s=structuredClone(S);s.seq++;useGame(s);const now=ser
     s.managers.push({id:"m"+s.seq,owner:by,name,color:a.color,icon:a.icon,money:0,squad:[],powers:[]});log(s,`${name} joined online.`);break}
   case"editM":{const m=M(a.mid);if(!m)break;if(!host&&m.owner!==by)throw"You can only change your own manager.";if(a.data.icon)m.icon=a.data.icon;if(a.data.color)m.color=a.data.color;break}
   case"removeM":{hostOnly();inSetup();const m=M(a.mid);s.managers=s.managers.filter(x=>x.id!==a.mid);if(m)log(s,`${m.name} was removed.`);break}
-  case"start":{hostOnly();inSetup();if(s.mode==="custom"){s.custom.list=parseCustom(s.custom.text);useGame(s)}
-    const n=s.managers.length,need=n*s.settings.squad;if(n<2)throw"Add at least 2 managers.";
-    if(P.length<need)throw`${MODE.name} needs at least ${need} entries for ${n} managers (it has ${P.length}).`;
-    s.managers.forEach(m=>{m.money=s.settings.budget;m.squad=[];m.powers=[]});
-    const pool=shuffle(P.map(p=>p.id)).slice(0,need);s.used=[...pool];s.queue=pool.map(pid=>({k:"p",pid}));s.requeued=[];s.round="main";s.phase="auction";s.lotNo=0;s.lotTotal=pool.length;s.doubled={};s.trades=[];s.record=null;s.verdict=null;
-    log(s,`${MODE.name}: ${pool.length} ${MODE.noun}s up for auction. $${s.settings.budget} each, ${s.settings.squad} per squad.`);nextLot(s);break}
+  case"start":hostOnly();inSetup();s.ready=null;doStart(s);break;
+  case"addBot":{hostOnly();inSetup();if(s.managers.length>=MAXMGR)throw`${MAXMGR} managers is the most.`;
+    const used=s.managers.map(x=>x.name.toLowerCase()),name=BOT_NAMES.find(n=>!used.includes(n.toLowerCase()))||("Bot "+s.seq);
+    const usedC=s.managers.map(x=>x.color),color=COLORS.find(c=>!usedC.includes(c))||COLORS[s.seq%COLORS.length];
+    s.managers.push({id:"m"+s.seq,owner:by,bot:true,persona:+(0.8+Math.random()*0.5).toFixed(2),name,color,icon:"🤖",money:0,squad:[],powers:[]});log(s,`${name} (bot) joined.`);break}
+  case"readyCheck":{hostOnly();inSetup();doStart(structuredClone(s));const owners=humanOwners(s);
+    if(owners.every(o=>o===s.host)){doStart(s);break}
+    s.ready={n:s.seq,votes:{[s.host]:true}};log(s,"Ready check: is everyone happy with the settings?");break}
+  case"vote":{if(!s.ready||s.phase!=="setup")break;if(!humanOwners(s).includes(by))throw"Only players in the game can vote.";s.ready.votes[by]=!!a.yes;
+    const who=s.managers.find(x=>x.owner===by&&!x.bot);if(!a.yes)log(s,`${who?who.name:"Someone"} wants a change. Check the suggestions.`);
+    if(humanOwners(s).every(o=>s.ready.votes[o]===true)){s.ready=null;doStart(s)}break}
+  case"cancelReady":hostOnly();s.ready=null;break;
+  case"suggest":{inSetup();if(host)break;if(!humanOwners(s).includes(by))throw"Join the game to make suggestions.";
+    s.suggestions=s.suggestions||[];if(s.suggestions.length>=12)throw"There are lots of suggestions already. Wait for the host.";
+    const note=cleanText(String(a.note||"").trim().slice(0,80));let kind,key=null,val=null,label;
+    if(a.what==="mode"){if(!NAMES[a.val])throw"Unknown mode.";kind="mode";val=a.val;label=`Mode: ${NAMES[a.val]}`}
+    else if(a.what==="note"){if(!note)throw"Type your idea first.";kind="note";label="Idea"}
+    else{const o=SETS.find(x=>x[0]===a.what);const opt=o&&o[2].find(x=>String(x[0])===String(a.val));if(!opt)throw"Pick a setting.";kind="setting";key=a.what;val=opt[0];label=`${o[1]}: ${opt[1]}`}
+    const who=s.managers.find(x=>x.owner===by&&!x.bot);s.suggestions.push({id:"s"+s.seq,by,name:who?who.name:"Someone",kind,key,val,label,note,votes:[by]});log(s,`${who?who.name:"Someone"} suggested: ${label}.`);break}
+  case"backSuggest":{const g=(s.suggestions||[]).find(x=>x.id===a.sid);if(!g)break;if(!humanOwners(s).includes(by)&&!host)break;g.votes=g.votes.includes(by)?g.votes.filter(x=>x!==by):[...g.votes,by];break}
+  case"resolveSuggest":{hostOnly();const g=(s.suggestions||[]).find(x=>x.id===a.sid);if(!g)break;s.suggestions=s.suggestions.filter(x=>x!==g);
+    if(a.accept&&s.phase==="setup"){if(g.kind==="mode"){s.mode=g.val;useGame(s)}else if(g.kind==="setting")s.settings[g.key]=g.val;s.ready=null;log(s,`Host used the suggestion: ${g.label}.`)}break}
   case"bid":{const L=s.lot,m=own(M(a.mid));if(!L)break;if(!eligible(s,m))throw m.id===L.leader?"You're already the top bidder.":"You can't bid on this one.";
     L.bid=Math.min(m.money,L.bid+Math.max(1,Math.min(50,a.inc|0)));L.leader=m.id;L.endsAt=now+s.settings.timer*1000;log(s,`${m.name} bids $${L.bid}.`);settle(s);break}
   case"pass":{const L=s.lot,m=own(M(a.mid));if(!L||m.id===L.leader)break;if(!L.passed.includes(m.id))L.passed.push(m.id);settle(s);break}
@@ -997,6 +1082,7 @@ function reduce(S,a){const s=structuredClone(S);s.seq++;useGame(s);const now=ser
     if(s.phase==="trade1"){const left=P.filter(p=>!s.used.includes(p.id)).sort((x,y)=>y.r-x.r).slice(0,30).map(p=>p.id);
       const w=shuffle(left).slice(0,s.settings.wild);s.used.push(...w);
       s.queue=shuffle([...w.map(pid=>({k:"p",pid})),...(s.settings.powers?Object.keys(POWERS).map(power=>({k:"w",power})):[])]);
+      if(!s.queue.length){s.phase="results";log(s,"No wildcards this game. The window has closed.");break}
       s.round="wild";s.phase="wild";s.lotNo=0;s.lotTotal=s.queue.length;log(s,"Wildcard round: extra players and power cards, bought with leftover money. No squad limit.");nextLot(s)}
     else if(s.phase==="trade2"){s.phase="results";log(s,"The window has closed. Over to Claude.")}break}
   case"verdict":hostOnly();s.verdict=a.verdict;break;
@@ -1004,11 +1090,11 @@ function reduce(S,a){const s=structuredClone(S);s.seq++;useGame(s);const now=ser
   return s}
 
 // ================= sound =================
-const SFX={ctx:null,muted:!!LS.get("tw-mute"),
+const SFX={ctx:null,muted:!!LS.get("tw-mute"),vol:LS.get("tw-vol")??0.8,
   init(){if(this.ctx)return;try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
-  tone(f,d,type="sine",v=.15,w=0){if(this.muted||!this.ctx)return;try{const c=this.ctx,t=c.currentTime+w,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(c.destination);o.start(t);o.stop(t+d+.02)}catch(e){}},
+  tone(f,d,type="sine",v=.15,w=0){if(this.muted||!this.ctx)return;try{const c=this.ctx,t=c.currentTime+w,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(Math.max(.0011,v*this.vol),t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(c.destination);o.start(t);o.stop(t+d+.02)}catch(e){}},
   noise(d,v=.3,w=0,f=800){if(this.muted||!this.ctx)return;try{const c=this.ctx,t=c.currentTime+w,b=c.createBuffer(1,Math.ceil(c.sampleRate*d),c.sampleRate),ch=b.getChannelData(0);for(let i=0;i<ch.length;i++)ch[i]=Math.random()*2-1;
-    const src=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();src.buffer=b;fl.type="lowpass";fl.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);src.connect(fl).connect(g).connect(c.destination);src.start(t)}catch(e){}},
+    const src=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();src.buffer=b;fl.type="lowpass";fl.frequency.value=f;g.gain.setValueAtTime(Math.max(.0011,v*this.vol),t);g.gain.exponentialRampToValueAtTime(.001,t+d);src.connect(fl).connect(g).connect(c.destination);src.start(t)}catch(e){}},
   bid(){this.tone(660,.08,"square",.05);this.tone(990,.1,"square",.045,.06)},
   tick(){this.tone(1300,.05,"square",.05)},
   flip(){this.noise(.16,.12,0,3500)},
@@ -1022,12 +1108,13 @@ addEventListener("pointerdown",()=>SFX.init(),{once:true});
 const PROFILE=LS.get("tw-profile")||{};
 const saveProfile=(name)=>{PROFILE.name=name;PROFILE.color=ui.newM.color;PROFILE.icon=ui.newM.icon;LS.set("tw-profile",PROFILE)};
 let G=null,shownSale=0,shownPower=0,lastLotKey=null,lastBidKey,seenVerdict=null,seenNotice=0;
-const ui={roster:false,previewMode:null,rq:"",rrole:"",td:null,pw:{},reveal:null,typePos:Infinity,typeFor:null,leaveArm:false,newM:{color:PROFILE.color||COLORS[Math.floor(Math.random()*COLORS.length)],icon:PROFILE.icon||ICONS[Math.floor(Math.random()*ICONS.length)]},screen:"home",coinPrev:{}};
+const prefs=LS.get("tw-prefs")||{};
+const ui={modal:LS.get("tw-tut")?null:"tutorial",tut:0,sg:{what:"mode"},chatOpen:false,homeSeen:false,roster:false,previewMode:null,rq:"",rrole:"",td:null,pw:{},reveal:null,typePos:Infinity,typeFor:null,leaveArm:false,newM:{color:PROFILE.color||COLORS[Math.floor(Math.random()*COLORS.length)],icon:PROFILE.icon||ICONS[Math.floor(Math.random()*ICONS.length)]},screen:"home",coinPrev:{}};
 const JOIN=(new URLSearchParams(location.search).get("join")||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,5);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,3600)}
 const Mby=id=>G.managers.find(m=>m.id===id);
-const mine=m=>!!m&&m.owner===ME;
+const mine=m=>!!m&&m.owner===ME&&!m.bot;
 const myMs=()=>G?G.managers.filter(mine):[];
 const amHost=()=>!!G&&G.host===ME&&role!=="guest";
 const badge=(m,s)=>`<span class="badge ${s?"s":""}" style="--c:${esc(m.color)}" aria-hidden="true">${esc(m.icon)}</span>`;
@@ -1040,12 +1127,12 @@ async function pushState(){if(role!=="host"||!online()||!CODE)return;if(writing)
   try{await fdb.ref(`games/${CODE}/state`).set({host:uid,s:JSON.stringify(G),t:TS()})}catch(e){toast("Couldn't save the game online. Check your internet.")}
   writing=false;if(dirty){dirty=false;pushState()}}
 function commit(){if(role==="local")LS.set("tw-game",G);else pushState();render()}
-function act(a){a.by=ME;try{G=reduce(G,a);commit()}catch(e){toast(typeof e==="string"?e:"Something went wrong.");if(typeof e!=="string")console.error(e)}}
+function act(a){a.by=ME;try{const prev=G.phase;G=reduce(G,a);phaseHook(prev);commit()}catch(e){toast(typeof e==="string"?e:"Something went wrong.");if(typeof e!=="string")console.error(e)}}
 function dispatch(a){if(!G)return;if(role==="guest"){a.by=ME;fdb.ref(`games/${CODE}/actions`).push({by:uid,a:JSON.stringify(a),t:TS()}).catch(()=>toast("Couldn't reach the game. Check your internet."))}else act(a)}
 function leaveNet(){offs.forEach(f=>{try{f()}catch(e){}});offs=[]}
 function watchActions(){const ref=fdb.ref(`games/${CODE}/actions`);
   const h=snap=>{const v=snap.val();snap.ref.remove().catch(()=>{});if(!v||!G)return;let a;try{a=JSON.parse(v.a)}catch(e){return}a.by=v.by;
-    try{G=reduce(G,a)}catch(e){G={...G,seq:G.seq+1,notice:{to:v.by,msg:typeof e==="string"?e:"That move didn't work.",n:G.seq+1}};if(typeof e!=="string")console.error(e)}commit()};
+    try{const prev=G.phase;G=reduce(G,a);phaseHook(prev)}catch(e){G={...G,seq:G.seq+1,notice:{to:v.by,msg:typeof e==="string"?e:"That move didn't work.",n:G.seq+1}};if(typeof e!=="string")console.error(e)}commit()};
   ref.on("child_added",h,()=>toast("Lost the connection to your game."));offs.push(()=>ref.off("child_added",h))}
 function watchState(){const ref=fdb.ref(`games/${CODE}/state`);
   const h=snap=>{const v=snap.val();if(!v)return;let g;try{g=JSON.parse(v.s)}catch(e){return}G=g;
@@ -1056,7 +1143,7 @@ const genCode=()=>Array.from({length:5},()=>"ABCDEFGHJKLMNPQRSTUVWXYZ"[Math.floo
 async function hostOnline(){if(!online())return toast("Online play isn't connected yet.");
   try{let code,tries=0;do{code=genCode();const s=await fdb.ref(`games/${code}/state`).get();if(!s.exists())break}while(++tries<6);
     leaveNet();role="host";ME=uid;CODE=code;G=newGame(null,uid);G.code=code;syncSeen();LS.set("tw-session",{code});
-    watchActions();await pushState();ui.screen="game";ui.td=null;ui.pw={};render();scrollTo(0,0)}
+    watchActions();startChat();await pushState();ui.screen="game";ui.td=null;ui.pw={};render();scrollTo(0,0)}
   catch(e){console.error(e);toast("Couldn't create the game. Check the Firebase rules (README step 3).")}}
 async function joinOnline(code,profile){if(!online())return toast("Online play isn't connected yet.");
   code=String(code||"").trim().toUpperCase();if(!/^[A-Z]{5}$/.test(code))return toast("Game codes are 5 letters.");
@@ -1064,12 +1151,12 @@ async function joinOnline(code,profile){if(!online())return toast("Online play i
   if(!snap.exists())return toast(`No game found with code ${code}.`);
   const v=snap.val();let g;try{g=JSON.parse(v.s)}catch(e){return toast("That game couldn't be loaded.")}
   leaveNet();CODE=code;ME=uid;G=g;syncSeen();LS.set("tw-session",{code});ui.td=null;ui.pw={};
-  if(v.host===uid){role="host";watchActions()}
+  startChat();if(v.host===uid){role="host";watchActions()}
   else{role="guest";watchState();if(profile&&G.phase==="setup"&&!G.managers.some(m=>m.owner===uid))dispatch({type:"join",...profile});
     else if(profile&&G.phase!=="setup"&&!G.managers.some(m=>m.owner===uid))toast("This game already started, so you're watching.")}
   ui.screen="game";render();scrollTo(0,0)}
 function startLocal(resume){leaveNet();role="local";ME="local";CODE=null;G=resume?LS.get("tw-game"):newGame(null,"local");if(!G)G=newGame(null,"local");syncSeen();ui.screen="game";ui.td=null;ui.pw={};LS.set("tw-game",G);render();scrollTo(0,0)}
-function goHome(){leaveNet();ui.screen="home";role=null;G=null;ui.leaveArm=false;render();scrollTo(0,0)}
+function goHome(){leaveNet();ui.chatOpen=false;chatMsgs=[];chatUnread=0;ui.screen="home";role=null;G=null;ui.leaveArm=false;render();scrollTo(0,0)}
 
 // confetti
 const fx=document.getElementById("fx"),fxc=fx.getContext("2d");let parts=[],fxOn=false;
@@ -1095,13 +1182,13 @@ function sheets(){return`<div class="squads">${G.managers.map(m=>{const avg=m.sq
   <span class="lbl">${m.squad.length} ${MODE.noun}${m.squad.length===1?"":"s"}${avg?` · avg ${avg}`:""}</span>${lineup(m)}
   ${m.powers.length?`<div class="row">${m.powers.map(p=>`<span class="pw-tag">${POWERS[p].name}</span>`).join("")}</div>`:""}</div>`}).join("")}</div>`}
 function topbar(){const i=PHASES.findIndex(p=>p[0]===G.phase);
-  return`<div class="bar"><div class="row" style="gap:14px"><span class="brand">Transfer <span>Window</span></span><span class="pw-tag">${esc(MODE.name)}</span>
+  return`<div class="bar"><div class="row" style="gap:12px">${LOGO}<span class="brand">Transfer <span>Window</span></span><span class="pw-tag">${esc(MODE.name)}</span>
     ${CODE?`<span class="pw-tag">Game ${esc(CODE)}</span><button class="ghost sm" data-a="copylink">Copy invite link</button>`:""}</div>
   <div class="steps">${PHASES.map((p,j)=>`<span class="${j===i?"on":j<i?"done":""}">${p[1]}</span>`).join("")}</div>
-  <div class="row"><button class="ghost sm" data-a="roster">${esc(MODE.noun)} list</button><button class="ghost sm" data-a="mute">${SFX.muted?"Sound off":"Sound on"}</button>
+  <div class="row"><button class="ghost sm" data-a="roster">${esc(MODE.noun)} list</button><button class="ghost sm iconbtn" data-a="help" title="Help" aria-label="Help">?</button><button class="ghost sm" data-a="settings">Settings</button>
   <button class="ghost sm" data-a="home">${ui.leaveArm?(amHost()&&role==="host"?"Leave? Game pauses":"Click again to leave"):"Home"}</button></div></div>`}
 const feed=()=>`<div class="panel"><span class="lbl">Match feed</span><div class="log">${G.log.map(l=>`<div>${esc(l)}</div>`).join("")}</div></div>`;
-const footer=()=>`<p class="credit">Made by <b>Harry Sujivan</b></p>`;
+const footer=()=>`<p class="credit">By <b>The King Harry</b></p>`;
 const watchingNote=()=>role==="guest"&&!myMs().length?`<div class="panel"><p><b>You're watching.</b> <span class="muted">You don't have a manager in this game, but you can follow along live.</span></p></div>`:"";
 
 // ---------- home ----------
@@ -1110,37 +1197,43 @@ const pickers=()=>`<span class="lbl">Colour</span><div class="swatches">${COLORS
   <span class="lbl">Badge</span><div class="icons">${ICONS.map(i=>`<button type="button" class="ic ${ui.newM.icon===i?"on":""}" data-a="nicon" data-v="${i}">${i}</button>`).join("")}</div>`;
 function netNote(){if(!CFG_OK)return`<p class="netnote">Online play isn't set up yet. Add your Firebase settings to <b>firebase-config.js</b> (see the README). You can still play on one laptop.</p>`;
   if(netErr)return`<p class="netnote err">${esc(netErr)}</p>`;if(!uid)return`<p class="netnote">Connecting to online play…</p>`;return`<p class="netnote">Online play is ready. Each player uses their own laptop.</p>`}
+const fmt=n=>Number(n||0).toLocaleString("en-AU");
+function statsHTML(){if(!online())return"";return`<span><span class="dot"></span><b>${fmt(Math.max(1,NET.online))}</b> online now</span><span><b>${fmt(NET.stats.visits)}</b> visits</span><span><b>${fmt(NET.stats.games)}</b> games played</span>`}
+function boardHTML(){const rows=Object.values(NET.board||{}).filter(r=>r&&r.name&&r.wins).sort((a,b)=>b.wins-a.wins).slice(0,10);
+  return rows.length?rows.map((r,i)=>`<b>${i+1}</b><span>${esc(r.name)}</span><span class="acc">${r.wins} win${r.wins===1?"":"s"}</span>`).join(""):'<span></span><span class="empty">No winners yet. Be the first!</span><span></span>'}
 function home(){const saved=LS.get("tw-game"),sess=LS.get("tw-session"),wins=Object.entries(LS.get("tw-wins")||{}).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const pos=[[4,8,-8],[46,0,6],[22,40,-3],[64,34,9],[8,62,4],[50,64,-6]];
-  const word=(w,d)=>[...w].map((c,i)=>`<i style="animation-delay:${d+i*.05}s">${c}</i>`).join("");
-  return`<div class="bar"><span></span><button class="ghost sm" data-a="mute">${SFX.muted?"Sound off":"Sound on"}</button></div>
+  const word=(w,d)=>[...w].map((c,i)=>ui.homeSeen?c:`<i style="animation-delay:${d+i*.05}s">${c}</i>`).join("");
+  return`<div class="bar"><div class="row" style="gap:14px">${LOGO}<div class="stats" id="stats">${statsHTML()}</div></div>
+    <div class="row"><button class="ghost sm" data-a="tutorial">How to play</button><button class="ghost sm" data-a="settings">Settings</button><button class="ghost sm" data-a="mute">${SFX.muted?"Sound off":"Sound on"}</button></div></div>
   <section class="hero"><div style="display:flex;flex-direction:column;gap:20px">
     <h1 class="title"><span class="w">${word("Transfer",0)}</span><span class="w">${word("Window",.4)}</span></h1>
     <p class="tag">Bid against the clock, trade like a shark, play power cards, then let Claude crown the champion.</p>
-    <div class="row"><button class="acc-b big" data-a="hostgame" ${online()?"":"disabled"}>Host online game</button><button class="ghost big" data-a="local">Play on one laptop</button></div>
+    <div class="row"><button class="acc-b big" data-a="hostgame" ${online()?"":"disabled"}>Host online game</button><button class="ghost big" data-a="local">Play on one laptop</button><button class="ghost big" data-a="practice">Practice vs bots</button></div>
     ${netNote()}
     ${sess||saved?`<div class="row">${sess?`<button class="ghost sm" data-a="rejoin" ${online()?"":"disabled"}>Rejoin game ${esc(sess.code)}</button>`:""}${saved?`<button class="ghost sm" data-a="resumeLocal">Resume one-laptop game</button>`:""}</div>`:""}
-    <p class="credit" style="text-align:left">Made by <b>Harry Sujivan</b></p></div>
+    <p class="credit" style="text-align:left">By <b>The King Harry</b></p></div>
     <div class="deck" aria-hidden="true">${HOMEDECK.map((p,i)=>`<div class="card ${tier(p.r)} ${i%2?"spin":""}" style="left:${pos[i][0]}%;top:${pos[i][1]}%;rotate:${pos[i][2]}deg;animation-delay:${i*.7}s"><span class="tier">${tier(p.r)}</span><span class="rt">${p.r}</span><span class="nm">${esc(p.name)}</span><div class="meta"><span>${esc(p.nat)}</span></div></div>`).join("")}</div></section>
   <section class="panel" id="joinbox"><h2>Join a friend's game</h2><form id="f-join" class="joingrid">
     <div class="field"><label class="lbl" for="j-code">Game code</label><input id="j-code" class="codein" maxlength="5" placeholder="ABCDE" autocomplete="off" value="${esc(JOIN)}" data-keep>
       <label class="lbl" for="j-name">Your manager name</label><input id="j-name" maxlength="18" placeholder="e.g. Red Devils" data-keep value="${esc(PROFILE.name||"")}">
       <button type="submit" class="acc-b" ${online()?"":"disabled"}>Join game</button></div>
     <div class="field">${pickers()}</div></form></section>
-  <section class="panel"><h2>How to play</h2><div class="howto">${[["Set up","The host picks a mode and rules. Friends join with the game code on their own laptops."],["Auction","After each bid, everyone else has a few seconds to beat it or it's sold."],["Trade","Swap players, money or both. Counter-offers allowed. Deals are final."],["Wildcards","Extra stars and power cards (Steal, Block, Double, Swap) go up for auction."],["Final trades","Last chance to deal, and the moment to play your power cards."],["Claude judges","Everyone's best lineup is judged. Claude names the winner and the MVP, and calls the action."]].map((s,i)=>`<div class="st"><span class="num">${i+1}</span><h3>${s[0]}</h3><p class="small muted">${s[1]}</p></div>`).join("")}</div></section>
+  <section class="panel"><h2>How to play</h2><div class="howto">${[["Set up","The host picks a mode and rules. Friends join with the game code on their own laptops."],["Auction","After each bid, everyone else has a few seconds to beat it or it's sold."],["Trade","Swap players, money or both. Counter-offers allowed. Deals are final."],["Wildcards","Optional: extra stars and power cards (Steal, Block, Double, Swap)."],["Final trades","Last chance to deal, and the moment to play your power cards."],["Claude judges","Everyone's best lineup is judged. Claude names the winner and the MVP, and calls the action."]].map((s,i)=>`<div class="st"><span class="num">${i+1}</span><h3>${s[0]}</h3><p class="small muted">${s[1]}</p></div>`).join("")}</div></section>
   <section class="panel"><h2>Game modes</h2><p class="muted small">Click a mode to see everyone in it.</p><div class="modes">${GROUPS.flatMap(g=>g[1]).map(k=>`<button class="mode" data-a="preview" data-mode="${k}" style="background:${SWATCH[k]}"><b>${esc(NAMES[k])}</b><span>${esc(BLURB[k])}</span><em>${k==="custom"?"Your own list":`See all ${modeInfo(k).list.length}`}</em></button>`).join("")}</div></section>
-  ${wins.length?`<section class="panel"><h2>Hall of fame</h2><div class="lb">${wins.map(([n,w],i)=>`<b>${i+1}</b><span>${esc(n)}</span><span class="acc">${w} win${w===1?"":"s"}</span>`).join("")}</div></section>`:""}
+  <div class="lbgrid">${online()?`<section class="panel"><h2>Global leaderboard</h2><p class="small muted">Wins from every game played on this website.</p><div class="lb" id="gboard">${boardHTML()}</div></section>`:""}
+  ${wins.length?`<section class="panel"><h2>On this laptop</h2><div class="lb">${wins.map(([n,w],i)=>`<b>${i+1}</b><span>${esc(n)}</span><span class="acc">${w} win${w===1?"":"s"}</span>`).join("")}</div></section>`:""}</div>
   ${footer()}`}
 
 // ---------- setup ----------
 const SETS=[["budget","Budget",[[50,"$50"],[100,"$100"],[150,"$150"],[200,"$200"]]],["squad","Squad size",[[3,"3"],[4,"4"],[5,"5"],[6,"6"]]],["timer","Bid timer",[[5,"5 seconds"],[10,"10 seconds"],[15,"15 seconds"]]],
   ["wild","Wildcard players",[[0,"None"],[1,"1"],[2,"2"],[3,"3"],[4,"4"],[5,"5"]]],["powers","Power cards",[[true,"On"],[false,"Off"]]],["blind","Blind bid rounds",[[0,"Off"],[5,"Every 5th lot"],[3,"Every 3rd lot"]]],["mystery","Mystery players",[[0,"Off"],[.15,"Some"],[.3,"Lots"]]]];
 function setup(){const s=G.settings,mx=maxM(G),host=amHost(),custom=G.mode==="custom";
-  const managers=`<div style="display:flex;flex-direction:column;gap:6px">${G.managers.map(m=>`<div class="mgr">${badge(m)}<div><b>${esc(m.name)}</b>${you(m)}${role!=="local"&&m.owner!==G.host?' <span class="lbl">online</span>':""}</div><div class="row">${host||mine(m)?`<button class="ghost sm" data-a="cyc" data-mid="${m.id}">Badge</button>`:""}${host?`<button class="ghost sm" data-a="removeM" data-mid="${m.id}">Remove</button>`:""}</div></div>`).join("")||'<span class="empty">No managers yet.</span>'}</div>`;
+  const managers=`<div style="display:flex;flex-direction:column;gap:6px">${G.managers.map(m=>`<div class="mgr">${badge(m)}<div><b>${esc(m.name)}</b>${you(m)}${m.bot?'<span class="tag-bot">bot</span>':role!=="local"&&m.owner!==G.host?' <span class="lbl">online</span>':""}</div><div class="row">${(host||mine(m))&&!m.bot?`<button class="ghost sm" data-a="cyc" data-mid="${m.id}">Badge</button>`:""}${host?`<button class="ghost sm" data-a="removeM" data-mid="${m.id}">Remove</button>`:""}</div></div>`).join("")||'<span class="empty">No managers yet.</span>'}</div>`;
   if(!host){return`<div class="setup"><div class="col"><div class="panel"><span class="lbl">Game mode</span><h2>${esc(MODE.name)}</h2><p class="muted">${esc(BLURB[G.mode])}</p>
       <div class="row between"><span class="small muted">${P.length} ${esc(MODE.noun)}s</span><button class="ghost" data-a="roster" ${P.length?"":"disabled"}>View all ${esc(MODE.noun)}s</button></div></div>
     <div class="panel"><h2>Rules</h2><div class="sets">${SETS.map(([k,l,o])=>`<div class="kv"><span class="lbl">${l}</span><b>${esc((o.find(x=>String(x[0])===String(s[k]))||[0,s[k]])[1])}</b></div>`).join("")}</div></div></div>
-    <div class="col">${watchingNote()}<div class="panel"><h2>Managers (${G.managers.length})</h2>${managers}<p class="muted">Waiting for the host to start the auction…</p></div>${feed()}</div></div>`}
+    <div class="col">${watchingNote()}<div class="panel"><h2>Managers (${G.managers.length})</h2>${managers}<p class="muted">Waiting for the host to start the auction…</p></div>${suggestPanel()}${feed()}</div></div>`}
   const sel=(k,opts)=>`<select id="set-${k}" data-set="${k}">${opts.map(([v,l])=>`<option value="${v}" ${String(s[k])===String(v)?"selected":""}>${l}</option>`).join("")}</select>`;
   return`<div class="setup"><div class="col">
     ${CODE?`<div class="panel"><span class="lbl">Game code</span><div class="codebig">${esc(CODE)}</div><p class="small muted">Friends open this website, type the code under "Join a friend's game", or use the invite link. Keep this tab open: your laptop runs the game.</p><div class="row"><button data-a="copylink">Copy invite link</button></div></div>`:""}
@@ -1155,9 +1248,63 @@ function setup(){const s=G.settings,mx=maxM(G),host=amHost(),custom=G.mode==="cu
     <div class="col"><div class="panel"><h2>Managers (${G.managers.length})</h2>
       <form id="f-add" class="field"><label class="lbl" for="m-name">${CODE?"Add a manager on this laptop (you, or someone sharing it)":"Add a manager"}</label><div class="row"><input id="m-name" maxlength="18" placeholder="e.g. Harry FC" style="flex:1" data-keep value="${myMs().length?"":esc(PROFILE.name||"")}"><button type="submit" class="acc-b">Add</button></div>${pickers()}</form>
       ${managers}
-      <button class="acc-b big" data-a="start" ${G.managers.length<2?"disabled":""}>Start auction${G.managers.length>=2?` · ${G.managers.length*s.squad} ${esc(MODE.noun)}s`:""}</button>
+      <button class="ghost" data-a="addBot" ${G.managers.length>=MAXMGR?"disabled":""}>Add a bot 🤖</button>
+      <button class="acc-b big" data-a="${role==="local"?"start":"readyCheck"}" ${G.managers.length<2?"disabled":""}>Start auction${G.managers.length>=2?` · ${G.managers.length*s.squad} ${esc(MODE.noun)}s`:""}</button>
       ${mx<G.managers.length&&P.length?`<p class="small" style="color:var(--accent2)">This mode fits ${mx} managers with these rules. Lower the squad size or remove someone.</p>`:""}
-    </div>${feed()}</div></div>`}
+    </div>${suggestPanel()}${feed()}</div></div>`}
+function suggestPanel(){if(role==="local")return"";const list=G.suggestions||[],host=amHost(),can=!host&&myMs().length>0,what=ui.sg.what||"mode";
+  const opts=what==="mode"?GROUPS.flatMap(g=>g[1]).map(k=>[k,NAMES[k]]):what==="note"?[]:((SETS.find(x=>x[0]===what)||[0,0,[]])[2]);
+  return`<div class="panel" id="sgpanel"><h2>Suggestions</h2>
+  ${can?`<div class="field"><label class="lbl" for="sg-what">Suggest a change to the host</label><div class="row"><select id="sg-what"><option value="mode" ${what==="mode"?"selected":""}>Game mode</option>${SETS.map(([k,l])=>`<option value="${k}" ${what===k?"selected":""}>${l}</option>`).join("")}<option value="note" ${what==="note"?"selected":""}>Something else</option></select>
+    ${what==="note"?"":`<select id="sg-val">${opts.map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join("")}</select>`}</div>
+    <input id="sg-note" maxlength="80" placeholder="${what==="note"?"Your idea":"Why? (optional)"}" data-keep>
+    <button class="acc-b" data-a="suggest">Send suggestion</button></div>`:""}
+  ${list.length?list.map(g=>`<div class="sg"><div class="row between"><b>${esc(g.label)}</b><span class="small muted">from ${esc(g.name)}</span></div>${g.note?`<span class="small">${esc(cleanText(g.note))}</span>`:""}
+    <div class="row"><button class="ghost sm" data-a="backsg" data-sid="${g.id}" title="Agree">👍 ${g.votes.length}</button>${host?`${g.kind!=="note"?`<button class="acc-b sm" data-a="resolvesg" data-sid="${g.id}" data-ok="1">Use it</button>`:""}<button class="ghost sm" data-a="resolvesg" data-sid="${g.id}" data-ok="0">Dismiss</button>`:""}</div></div>`).join("")
+    :`<span class="empty">${host?"Players' suggestions show up here.":"No suggestions yet."}</span>`}</div>`}
+
+// ---------- modals ----------
+const mshell=(inner,cls="")=>`<div class="modal" data-a="closeM"><div class="mbox ${cls}" data-stop="1">${inner}</div></div>`;
+const TUT=[["🏟️","Welcome to Transfer Window","Build the best team by bidding on players in a live auction. Then Claude judges who wins."],
+  ["🔨","The auction","Players come up one at a time. Bid +$1, +$5 or +$10. After every bid, everyone else has a few seconds to beat it, or it's SOLD."],
+  ["🤝","Trading","Swap players, money or both with other managers, and send counter-offers. Once a deal is accepted, there's no going back."],
+  ["🃏","Wildcards and power cards","If the host switches them on: extra stars, plus Steal, Swap, Double and Block cards, bought with leftover money."],
+  ["🏆","The verdict","Everyone's best lineup is judged, matched to the smallest squad. Claude names the winner and the MVP, and commentates the decider."],
+  ["🎮","Ways to play","Host online and share the code, play together on one laptop, or practise against bots. Use 😂🔥 reactions and chat during online games."]];
+function tutModal(){const i=Math.min(ui.tut,TUT.length-1),t=TUT[i],last=i===TUT.length-1;
+  return mshell(`<span class="tut-art" aria-hidden="true">${t[0]}</span><span class="lbl">Step ${i+1} of ${TUT.length}</span><h2 style="font-size:2.2rem">${t[1]}</h2><p class="muted">${t[2]}</p>
+  <div class="tut-dots">${TUT.map((_,j)=>`<i class="${j===i?"on":""}"></i>`).join("")}</div>
+  <div class="row" style="justify-content:center">${i?`<button class="ghost" data-a="tutback">Back</button>`:""}<button class="acc-b big" data-a="${last?"tutdone":"tutnext"}">${last?"Let's play":"Next"}</button>${last?"":`<button class="ghost" data-a="tutdone">Skip</button>`}</div>`,"tut")}
+function helpModal(){const ph=G&&ui.screen==="game"?G.phase:"home",host=amHost();
+  const T={home:[["Host online game","Your laptop runs the game. Share the 5-letter code with friends."],["Join a friend's game","Type their code and your name, pick a colour and badge."],["Play on one laptop","Everyone takes turns on the same screen."],["Practice vs bots","Play against computer managers to learn the game."]],
+   setup:host?[["Pick a mode","Use the Game mode dropdown. Click View all to see everyone in it."],["Set the rules","Budget, squad size, timer and extras. Wildcards stay off unless you switch them on."],["Add players","Friends join with the code. You can also add people sharing your laptop, or bots."],["Start",role==="local"?"Click Start auction when everyone's added.":"Everyone gets a ready check. It starts when they're all in, or click Start now."]]
+     :[["Wait for the host","The host picks the mode and rules."],["Suggest changes","Use Suggestions to ask for a different mode or setting. Click 👍 to agree with someone else's."],["Ready check","When the host is ready, you'll be asked if you're happy. Click I'm in."]],
+   auction:[["Bid","Click +$1, +$5 or +$10 on your manager. The clock restarts after every bid."],["Pass","Pass if you don't want this one. When everyone else passes, the top bid wins."],["Squad limit",`You can buy up to ${G?.settings.squad||4} in the main auction. Save some money!`],["Blind and mystery","Blind lots: type a secret bid. Mystery cards are revealed after they're sold."]],
+   trade1:[["Make offers","Tick players, add money, then send. Trade anything you like."],["Counter","Got an offer? Accept, decline, or click Counter to change it."],["Final","Accepted deals can't be undone. Bots only accept deals that help them."]],
+   wild:[["Wildcards","Extra players and power cards. No squad limit, so spend your leftover money."],["Power cards","Steal, Swap, Double and Block are played in the final trading round."]],
+   trade2:[["Last trades","Same as before, plus power cards."],["Power cards","Steal takes a player, Swap trades one of yours for theirs, Double makes one count twice. Block stops a Steal or Swap automatically."]],
+   results:[["Judging",`Everyone is judged on their best ${G?judgeN():"few"}, matched to the smallest squad.`],["Claude",host?"Copy the prompt, paste it into claude.ai, then paste Claude's answer back here.":"The host asks Claude, then everyone sees the reveal."],["Quick score","No Claude? The quick score uses ratings plus variety."]]};
+  const title=ph==="home"?"Getting started":(PHASES.find(p=>p[0]===ph)||[0,"Help"])[1];
+  return mshell(`<div class="row between"><h2>Help: ${esc(title)}</h2><button class="ghost" data-a="closeM">Close</button></div><ul class="tips">${(T[ph]||T.home).map(([a,b])=>`<li><b>${a}</b>${b}</li>`).join("")}</ul><button class="ghost" data-a="tutorial">Show the full tutorial</button>`)}
+function settingsModal(){return mshell(`<div class="row between"><h2>Settings</h2><button class="ghost" data-a="closeM">Close</button></div>
+  <div class="field"><span class="lbl">Sound</span><div class="row"><button class="sm ${SFX.muted?"ghost":"acc-b"}" data-a="mute">${SFX.muted?"Sound off":"Sound on"}</button><label class="lbl" for="vol">Volume</label><input type="range" id="vol" min="0" max="100" value="${Math.round(SFX.vol*100)}"></div></div>
+  <div class="field"><span class="lbl">Animations</span><div class="toggle"><button class="sm ${prefs.calm?"ghost":"acc-b"}" data-a="calm" data-v="0">Full</button><button class="sm ${prefs.calm?"acc-b":"ghost"}" data-a="calm" data-v="1">Reduced</button></div></div>
+  <div class="field"><span class="lbl">Chat and reactions</span><div class="toggle"><button class="sm ${prefs.chat===false?"ghost":"acc-b"}" data-a="chatpref" data-v="1">Show</button><button class="sm ${prefs.chat===false?"acc-b":"ghost"}" data-a="chatpref" data-v="0">Hide</button></div></div>
+  <div class="field"><label class="lbl" for="pf-name">Your usual name</label><input id="pf-name" maxlength="18" value="${esc(PROFILE.name||"")}" placeholder="Filled in when you join or host" data-keep></div>
+  <div class="field">${pickers()}</div>
+  <div class="row"><button class="acc-b" data-a="saveprof">Save my details</button><button class="ghost" data-a="tutorial">Show the tutorial again</button></div>
+  <p class="small muted">Your details are saved on this laptop and filled in for you next time.</p>`)}
+function readyModal(){const r=G&&ui.screen==="game"&&G.phase==="setup"?G.ready:null;if(!r)return"";
+  const owners=[...new Set(G.managers.filter(m=>!m.bot).map(m=>m.owner))],host=amHost(),meIn=owners.includes(ME),myVote=r.votes[ME];
+  if(!host&&myVote===false)return"";
+  const st=G.settings,items=[["Mode",MODE.name],...SETS.map(([k,l,o])=>[l,(o.find(x=>String(x[0])===String(st[k]))||[0,st[k]])[1]])];
+  return`<div class="ov solid" style="z-index:28"><div class="mbox"><span class="crown">Ready check</span><h2 style="font-size:2.2rem">Happy with these settings?</h2>
+  <div class="sets">${items.map(([l,v])=>`<div class="kv"><span class="lbl">${esc(l)}</span><b>${esc(v)}</b></div>`).join("")}</div>
+  <div>${owners.map(o=>{const v=r.votes[o],ms=G.managers.filter(x=>x.owner===o&&!x.bot);return`<div class="vote">${badge(ms[0],1)}<span><b>${esc(ms.map(x=>x.name).join(", "))}</b>${o===G.host?' <span class="lbl">host</span>':""}</span><span class="status ${v===true?"acc":""}">${v===true?"✓ In":v===false?"Wants a change":"Deciding…"}</span></div>`}).join("")}
+  ${G.managers.some(m=>m.bot)?'<p class="small muted" style="margin-top:6px">Bots are always ready.</p>':""}</div>
+  ${host?`<div class="row"><button class="acc-b big" data-a="start">Start now</button><button class="ghost" data-a="cancelReady">Back to setup</button></div><p class="small muted">The auction starts by itself when everyone is in.</p>`
+    :meIn?(myVote===true?'<p class="muted">You&#39;re in. Waiting for the others…</p>':`<div class="row"><button class="acc-b big" data-a="vote" data-yes="1">I'm in</button><button class="ghost" data-a="vote" data-yes="0">Suggest a change</button></div>`)
+    :'<p class="muted">Waiting for the players…</p>'}</div></div>`}
 
 // ---------- roster ----------
 function roster(){const info=G&&ui.screen==="game"?MODE:modeInfo(ui.previewMode||"soccer"),list0=info.list,inGame=!!G&&ui.screen==="game"&&G.phase!=="setup";
@@ -1282,18 +1429,19 @@ function render(){const app=document.getElementById("app"),ae=document.activeEle
   const keep={};document.querySelectorAll("[data-keep]").forEach(el=>{if(el.id)keep[el.id]=el.value});
   if(ui.screen!=="home"&&!G)ui.screen="home";
   if(G)useGame(G);
+  document.body.classList.toggle("calm",!!prefs.calm);
   document.body.dataset.theme=ui.screen==="home"?(ui.roster&&ui.previewMode?ui.previewMode:"mega"):G.mode;
-  if(ui.screen==="home"){app.innerHTML=home()}
+  if(ui.screen==="home"){app.innerHTML=home();ui.homeSeen=true}
   else{let body="";
     if(G.phase==="setup")body=setup();
     else if(G.phase==="auction"||G.phase==="wild")body=watchingNote()+auction()+sheets()+feed();
     else if(G.phase==="trade1"||G.phase==="trade2")body=`<div class="panel"><h2>${G.phase==="trade1"?"Trading window":"Final trading round"}</h2><p class="muted">${G.phase==="trade1"?"Trade players, money or both before the wildcards. Accepted deals are final.":"Last chance to trade, and the time to play power cards. Accepted deals are final."}</p></div>`+tradeUI()+sheets()+feed();
     else body=results();
     app.innerHTML=topbar()+body+footer()}
-  document.getElementById("layer").innerHTML=(ui.roster?roster():"")+(ui.reveal==="drum"?`<div class="ov solid"><div class="drum">And the winner is…</div></div>`:"");
+  document.getElementById("layer").innerHTML=(ui.roster?roster():"")+(ui.modal==="settings"?settingsModal():ui.modal==="help"?helpModal():ui.modal==="tutorial"?tutModal():"")+readyModal()+(ui.reveal==="drum"?`<div class="ov solid"><div class="drum">And the winner is…</div></div>`:"");
   for(const id in keep){const el=document.getElementById(id);if(el&&keep[id]!==""&&el.value!==keep[id])el.value=keep[id]}
   if(fid){const el=document.getElementById(fid);if(el){el.focus();if(sel)try{el.setSelectionRange(...sel)}catch(e){}}}
-  afterRender()}
+  renderChat();afterRender()}
 function afterRender(){if(!G||ui.screen==="home")return;
   const key=G.lot?`${G.id}:${G.round}:${G.lotNo}`:null;if(key&&key!==lastLotKey){const c=document.getElementById("lotcard");if(c){c.classList.add("flip");if(lastLotKey!==null)SFX.flip()}}lastLotKey=key;
   const bk=G.lot&&!G.lot.blind&&G.lot.leader?`${key}:${G.lot.bid}`:null;if(bk&&lastBidKey!==undefined&&bk!==lastBidKey)SFX.bid();lastBidKey=bk;
@@ -1307,7 +1455,7 @@ function afterRender(){if(!G||ui.screen==="home")return;
 function revealVerdict(){const gid=G.id;ui.reveal="drum";SFX.drum(2.4);render();
   setTimeout(()=>{if(!G||G.id!==gid)return;ui.reveal=null;ui.typeFor=gid;ui.typePos=0;render();SFX.fanfare();
     const v=G.verdict,w=G.managers.find(m=>m.name.toLowerCase()===v.winner.toLowerCase());confetti([w?.color||"#ffd166","#ffffff",getComputedStyle(document.body).getPropertyValue("--accent")],220);startTyping();
-    const counted=LS.get("tw-counted")||[];if(!counted.includes(gid)){const wins=LS.get("tw-wins")||{};wins[v.winner]=(wins[v.winner]||0)+1;LS.set("tw-wins",wins);LS.set("tw-counted",[gid,...counted].slice(0,50))}},2400)}
+    const counted=LS.get("tw-counted")||[];if(!counted.includes(gid)){if(role!=="guest"&&online()&&w&&!w.bot)recordWin(w.name);const wins=LS.get("tw-wins")||{};wins[v.winner]=(wins[v.winner]||0)+1;LS.set("tw-wins",wins);LS.set("tw-counted",[gid,...counted].slice(0,50))}},2400)}
 function showSold(S){const m=Mby(S.mid);if(!m)return;const layer=document.createElement("div");layer.className="ov";layer.style.cursor="pointer";
   layer.innerHTML=`<div class="soldbox">${cardHTML(S.k==="p"?P[S.pid]:null,{power:S.k==="w"?S.power:null,cls:"flip"})}<div class="stamp">SOLD</div><div class="soldto">${S.mystery?"Mystery revealed! ":""}${esc(m.icon)} ${esc(m.name)} · $${S.amt}</div></div>`;
   document.body.appendChild(layer);SFX.sold();confetti([m.color,"#ffffff","#ffd166"],120);const close=()=>layer.remove();layer.onclick=close;setTimeout(close,1900)}
@@ -1319,18 +1467,100 @@ function updateClock(){const box=document.getElementById("clock");if(!box||!G?.l
   if(sec<=3&&sec>0&&sec!==lastSec){SFX.tick();const st=document.getElementById("stage");if(st){st.classList.remove("shake","flash");void st.offsetWidth;st.classList.add("shake","flash")}}lastSec=sec}
 setInterval(()=>{if(ui.screen==="game"&&role!=="guest"&&G?.lot&&!G.lot.blind&&G.lot.leader&&serverNow()>=G.lot.endsAt)act({type:"timeout"});else updateClock()},100);
 
+// ================= online extras: stats, leaderboard, chat, reactions =================
+const NET={stats:{},online:0,board:{}};
+function startNet(){
+  try{if(!sessionStorage.getItem("tw-visit")){sessionStorage.setItem("tw-visit","1");fdb.ref("stats/visits").transaction(n=>(n||0)+1).catch(()=>{})}}catch(e){}
+  try{const me=fdb.ref("online/"+uid);me.onDisconnect().remove();me.set(true).catch(()=>{})}catch(e){}
+  fdb.ref("stats").on("value",s=>{NET.stats=s.val()||{};homeRefresh()},()=>{});
+  fdb.ref("online").on("value",s=>{NET.online=s.numChildren();homeRefresh()},()=>{});
+  fdb.ref("leaderboard").on("value",s=>{NET.board=s.val()||{};homeRefresh()},()=>{})}
+function homeRefresh(){if(ui.screen!=="home")return;const a=document.getElementById("stats");if(a)a.innerHTML=statsHTML();const b=document.getElementById("gboard");if(b)b.innerHTML=boardHTML()}
+function phaseHook(prev){if(prev==="setup"&&G.phase==="auction"&&online()&&role!=="guest")fdb.ref("stats/games").transaction(n=>(n||0)+1).catch(()=>{})}
+function recordWin(name){const key=name.toLowerCase().replace(/[.#$\[\]\/\s]+/g,"_").slice(0,40)||"_";fdb.ref("leaderboard/"+key).transaction(c=>({name,wins:((c&&c.wins)||0)+1})).catch(()=>{})}
+let chatMsgs=[],chatUnread=0,joinedAt=0,lastChat=0,lastReact=0;
+const myName=()=>(myMs()[0]?.name||PROFILE.name||"Spectator").slice(0,18);
+function startChat(){joinedAt=serverNow();chatMsgs=[];chatUnread=0;
+  const q=fdb.ref(`games/${CODE}/chat`).limitToLast(60);const h=snap=>{const v=snap.val();if(!v||typeof v.text!=="string")return;chatMsgs.push({id:snap.key,by:v.by,name:String(v.name||"?"),text:v.text});if(chatMsgs.length>60)chatMsgs.shift();if(!ui.chatOpen&&v.by!==uid&&(v.t||0)>joinedAt-3000)chatUnread++;renderChat()};
+  q.on("child_added",h);offs.push(()=>q.off("child_added",h));
+  const f=fdb.ref(`games/${CODE}/fx`).limitToLast(10);const fh=snap=>{const v=snap.val();if(!v)return;if(role==="host")setTimeout(()=>snap.ref.remove().catch(()=>{}),8000);if((v.t||0)<joinedAt-3000||!REACTS.includes(v.e))return;floatEmoji(v.e,cleanText(String(v.name||"")).slice(0,18))};
+  f.on("child_added",fh);offs.push(()=>f.off("child_added",fh))}
+function sendChat(text){text=cleanText(String(text||"").trim()).slice(0,200);if(!text)return;if(Date.now()-lastChat<800)return toast("Slow down a little.");lastChat=Date.now();
+  fdb.ref(`games/${CODE}/chat`).push({by:uid,name:myName(),text,t:TS()}).catch(()=>toast("Couldn't send. Check your internet."))}
+function react(e){if(!REACTS.includes(e)||Date.now()-lastReact<350)return;lastReact=Date.now();
+  if(role==="local"||!online())return floatEmoji(e,myMs()[0]?.name||"");fdb.ref(`games/${CODE}/fx`).push({by:uid,e,name:myName(),t:TS()}).catch(()=>{})}
+function floatEmoji(e,name){const d=document.createElement("div");d.className="floater";d.style.left=(8+Math.random()*60)+"%";d.innerHTML=`<span>${e}</span>${name?`<small>${esc(name)}</small>`:""}`;document.body.appendChild(d);setTimeout(()=>d.remove(),2700)}
+function renderChat(){const dock=document.getElementById("chat");const show=ui.screen==="game"&&G&&prefs.chat!==false;
+  if(!show){dock.innerHTML="";dock.dataset.sig="";document.body.classList.remove("chatopen");return}
+  const net=role!=="local"&&online(),sig=`${net}:${ui.chatOpen}`;document.body.classList.toggle("chatopen",net&&ui.chatOpen);
+  if(dock.dataset.sig!==sig){dock.dataset.sig=sig;dock.innerHTML=`${net&&ui.chatOpen?`<div class="chatbox"><div class="chathead"><b>Chat</b><button class="ghost sm" data-a="chat">Close</button></div><div class="msgs" id="msgs"></div><form class="chatin" id="f-chat"><input id="chat-in" maxlength="200" placeholder="Say something…" autocomplete="off" aria-label="Chat message"><button class="acc-b sm" type="submit">Send</button></form></div>`:""}
+    <div class="row" style="justify-content:flex-end"><div class="reacts">${REACTS.map(e=>`<button data-a="react" data-e="${e}" aria-label="React ${e}">${e}</button>`).join("")}</div>${net?'<button class="acc-b" data-a="chat" id="chatbtn"></button>':""}</div>`}
+  const btn=document.getElementById("chatbtn");if(btn)btn.innerHTML=ui.chatOpen?"Hide chat":`Chat${chatUnread?`<span class="unread">${chatUnread}</span>`:""}`;
+  const box=document.getElementById("msgs");if(box){const atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<50;
+    box.innerHTML=chatMsgs.map(m=>{const mm=G.managers.find(x=>x.owner===m.by&&!x.bot);return`<div class="msg" style="--c:${esc(mm?.color||"var(--accent)")}"><b>${esc(cleanText(m.name))}</b> ${esc(cleanText(m.text))}</div>`}).join("")||'<div class="msg sys">No messages yet. Say hi!</div>';
+    if(atBottom||ui.chatJust){box.scrollTop=box.scrollHeight;ui.chatJust=false}}}
+
+// ================= bots (run on the host's laptop) =================
+const botPlan={};
+function botWant(m,L){const S=G.settings,main=G.round==="main",slots=main?S.squad-m.squad.length:99;if(main&&slots<=0)return 0;
+  let base=L.k==="w"?S.budget*.07:val(L.mystery?82:P[L.pid].r,S.budget);base*=m.persona||1;if(!main)base*=.8;
+  if(main){const per=m.money/slots;base=Math.max(base,Math.min(per*.85,base*1.6))}
+  const cap=m.money-(main?Math.max(0,slots-1):0);return Math.max(0,Math.min(cap,Math.round(base)))}
+function actBot(a){a.by=ME;try{const prev=G.phase;G=reduce(G,a);phaseHook(prev);commit();return true}catch(e){return false}}
+function botTick(){if(!G||role==="guest"||ui.screen!=="game"||ui.reveal)return;const bots=G.managers.filter(m=>m.bot&&m.owner===ME);if(!bots.length)return;const now=Date.now(),L=G.lot;
+  const due=k=>{if(botPlan[k]===undefined){botPlan[k]=now+450+Math.random()*1100;return false}if(botPlan[k]===-1||now<botPlan[k])return false;botPlan[k]=-1;return true};
+  if(L&&(G.phase==="auction"||G.phase==="wild")){const key=`${G.id}:${G.round}:${G.lotNo}:${L.blind?"b":L.bid}`;
+    for(const b of bots){if(!due(b.id+"|"+key))continue;
+      if(L.blind){if(L.blindIds.includes(b.id)&&!(b.id in L.sealed)){actBot({type:"seal",mid:b.id,amount:Math.round(botWant(b,L)*(.5+Math.random()*.4))});return}continue}
+      if(!eligible(G,b))continue;const w=botWant(b,L);
+      if(L.bid+1<=w){const room=w-L.bid,r=Math.random(),inc=room>=25&&r<.45?10:room>=8&&r<.6?5:1;actBot({type:"bid",mid:b.id,inc});return}
+      actBot({type:"pass",mid:b.id});return}}
+  if(G.phase==="trade1"||G.phase==="trade2"){
+    const gv=x=>x.p.reduce((t,id)=>t+val(P[id].r,G.settings.budget),0)+x.m;
+    for(const t of G.trades.filter(t=>t.status==="open")){const to=Mby(t.to);if(!to||!to.bot||to.owner!==ME||!due("t|"+t.id))continue;
+      const ok=gv(t.give)>=gv(t.get)*1.1&&to.squad.length-t.get.p.length+t.give.p.length>0;actBot({type:"respond",tid:t.id,accept:ok});return}
+    if(G.phase==="trade2")for(const b of bots){const pw=b.powers.find(x=>x!=="block");if(!pw||!due(`p|${G.id}|${b.id}|${b.powers.length}`))continue;
+      const best=a=>[...a].sort((x,y)=>P[y].r-P[x].r)[0],worst=a=>[...a].sort((x,y)=>P[x].r-P[y].r)[0];
+      const others=G.managers.filter(m=>m.id!==b.id&&m.squad.length).sort((x,y)=>P[best(y.squad)].r-P[best(x.squad)].r),tgt=others[0];
+      if(pw==="double"&&b.squad.length){actBot({type:"power",mid:b.id,power:"double",pid:best(b.squad)});return}
+      if(!tgt)continue;
+      if(pw==="steal"){actBot({type:"power",mid:b.id,power:"steal",target:tgt.id,pid:best(tgt.squad)});return}
+      if(pw==="swap"&&b.squad.length){actBot({type:"power",mid:b.id,power:"swap",target:tgt.id,pid:worst(b.squad),pid2:best(tgt.squad)});return}}}}
+setInterval(botTick,250);
+
 // ================= events =================
 async function copyText(t,okMsg){try{await navigator.clipboard.writeText(t);toast(okMsg)}catch(e){toast("Couldn't copy automatically. Select the text and press Ctrl+C.")}}
 document.addEventListener("submit",e=>{e.preventDefault();
   if(e.target.id==="f-add"){const i=document.getElementById("m-name"),name=i.value;const before=G.managers.length;i.value="";
     const firstMine=!myMs().length;act({type:"addM",name,color:ui.newM.color,icon:ui.newM.icon});if(G.managers.length>before){if(firstMine)saveProfile(name.trim());const used=G.managers.map(m=>m.color);ui.newM.color=COLORS.find(c=>!used.includes(c))||COLORS[0];ui.newM.icon=ICONS[(ICONS.indexOf(ui.newM.icon)+1)%ICONS.length];render();document.getElementById("m-name")?.focus()}else i.value=name}
+  if(e.target.id==="f-chat"){const i=document.getElementById("chat-in");sendChat(i.value);i.value="";return}
   if(e.target.id==="f-join"){const code=document.getElementById("j-code").value,name=document.getElementById("j-name").value.trim();
     if(!name)return toast("Type your manager name.");saveProfile(name);joinOnline(code,{name,color:ui.newM.color,icon:ui.newM.icon})}});
-document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;if(b.dataset.a==="closeR"&&e.target.closest("[data-stop]")&&!e.target.closest("button"))return;
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;if((b.dataset.a==="closeR"||b.dataset.a==="closeM")&&e.target.closest("[data-stop]")&&!e.target.closest("button"))return;
   const d=b.dataset,a=d.a;if(a!=="home")ui.leaveArm=false;
   switch(a){
   case"hostgame":hostOnline();break;
   case"local":startLocal(false);break;
+  case"practice":startLocal(false);act({type:"addM",name:PROFILE.name&&!isRude(PROFILE.name)?PROFILE.name:"You",color:ui.newM.color,icon:ui.newM.icon});for(let i=0;i<3;i++)act({type:"addBot"});toast("3 bots joined. Pick a mode, then start the auction.");break;
+  case"addBot":dispatch({type:"addBot"});break;
+  case"readyCheck":dispatch({type:"readyCheck"});break;
+  case"vote":dispatch({type:"vote",yes:d.yes==="1"});if(d.yes!=="1")setTimeout(()=>{document.getElementById("sgpanel")?.scrollIntoView({behavior:"smooth"});toast("Pick what you'd like changed, then send it.")},150);break;
+  case"cancelReady":dispatch({type:"cancelReady"});break;
+  case"suggest":{const what=document.getElementById("sg-what")?.value||"mode",v=document.getElementById("sg-val")?.value,n=document.getElementById("sg-note");dispatch({type:"suggest",what,val:what==="mode"||what==="note"?v:(what==="powers"?v==="true":+v),note:n?.value||""});if(n)n.value="";break}
+  case"backsg":dispatch({type:"backSuggest",sid:d.sid});break;
+  case"resolvesg":dispatch({type:"resolveSuggest",sid:d.sid,accept:d.ok==="1"});break;
+  case"settings":ui.modal="settings";render();break;
+  case"help":ui.modal="help";render();break;
+  case"tutorial":ui.modal="tutorial";ui.tut=0;render();break;
+  case"tutnext":ui.tut++;render();break;
+  case"tutback":ui.tut=Math.max(0,ui.tut-1);render();break;
+  case"tutdone":LS.set("tw-tut",1);ui.modal=null;render();break;
+  case"closeM":if(ui.modal==="tutorial")LS.set("tw-tut",1);ui.modal=null;render();break;
+  case"calm":prefs.calm=d.v==="1";LS.set("tw-prefs",prefs);render();break;
+  case"chatpref":prefs.chat=d.v==="1";LS.set("tw-prefs",prefs);render();break;
+  case"saveprof":{const n=document.getElementById("pf-name");const name=(n?.value||"").trim().slice(0,18);if(name&&isRude(name)){toast("Please pick a different name.");break}PROFILE.name=name;PROFILE.color=ui.newM.color;PROFILE.icon=ui.newM.icon;LS.set("tw-profile",PROFILE);toast("Saved on this laptop.");ui.modal=null;render();break}
+  case"chat":ui.chatOpen=!ui.chatOpen;if(ui.chatOpen){chatUnread=0;ui.chatJust=true}renderChat();if(ui.chatOpen)setTimeout(()=>document.getElementById("chat-in")?.focus(),0);break;
+  case"react":react(d.e);break;
   case"resumeLocal":startLocal(true);break;
   case"rejoin":{const s=LS.get("tw-session");if(s)joinOnline(s.code,null);break}
   case"preview":ui.previewMode=d.mode;ui.rq="";ui.rrole="";ui.roster=true;render();break;
@@ -1366,6 +1596,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
   }});
 document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="mode-sel")dispatch({type:"mode",mode:t.value});
+  else if(t.id==="sg-what"){ui.sg.what=t.value;render()}
   else if(t.dataset.set){const k=t.dataset.set,v=k==="powers"?t.value==="true":+t.value;dispatch({type:"setting",key:k,val:v})}
   else if(t.id==="t-from"){ui.td={...ui.td,from:t.value,give:[],gm:0,counterOf:null};render()}
   else if(t.id==="t-to"){ui.td={...ui.td,to:t.value,get:[],tm:0,counterOf:null};render()}
@@ -1375,8 +1606,9 @@ document.addEventListener("change",e=>{const t=e.target;
 document.addEventListener("input",e=>{const t=e.target;
   if(t.id==="t-gm"&&ui.td)ui.td.gm=Math.max(0,parseInt(t.value)||0);if(t.id==="t-tm"&&ui.td)ui.td.tm=Math.max(0,parseInt(t.value)||0);
   if(t.id==="j-code"){const c=t.value.toUpperCase().replace(/[^A-Z]/g,"");if(c!==t.value)t.value=c}
-  if(t.id==="rq"){ui.rq=t.value;render()}});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&ui.roster){ui.roster=false;render()}
+  if(t.id==="rq"){ui.rq=t.value;render()}
+  if(t.id==="vol"){SFX.vol=(+t.value)/100;LS.set("tw-vol",SFX.vol);clearTimeout(SFX.vt);SFX.vt=setTimeout(()=>SFX.tick(),80)}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(ui.roster||ui.modal)){if(ui.modal==="tutorial")LS.set("tw-tut",1);ui.roster=false;ui.modal=null;render()}
   if(e.key==="Enter"&&e.target.classList?.contains("sealin")){e.preventDefault();e.target.closest(".acts")?.querySelector('[data-a="seal"]')?.click()}});
 render();
 if(JOIN)setTimeout(()=>{document.getElementById("joinbox")?.scrollIntoView({behavior:"smooth"});document.getElementById("j-name")?.focus()},300);
